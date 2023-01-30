@@ -1,33 +1,34 @@
 package com.example.stockmarketpricepredictor20
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Icon
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import android.media.Image
+import android.util.Log
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DataArray
 import androidx.compose.material.icons.filled.DataExploration
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.stockmarketpricepredictor20.ui.theme.BackgroundColor
-import com.example.stockmarketpricepredictor20.ui.theme.StockMarketPricePredictor20Theme
-import com.example.stockmarketpricepredictor20.ui.theme.TopNavigationBarColor
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.stockmarketpricepredictor20.ui.theme.*
 
 @Composable
 fun HomePage() {
@@ -38,8 +39,121 @@ fun HomePage() {
 //        }
 //        UpperTab(0, titles = list, onStateChangedHai = {state=it})
 //
-    Column(modifier = Modifier.fillMaxSize()) {
-        Image(modifier = Modifier.fillMaxWidth(), painter = painterResource(id = R.drawable.tt), contentDescription = null)
+    val list = remember {
+        mutableStateListOf<Float>(10f, 20f, 120f, 60f)
+    }
+    val colorList=listOf<Color>(ProgressColor1, ProgressColor2, ProgressColor3, ProgressColor4)
+    val CompanyName=listOf<String>("C1","C2","C3","C4")
+    @DrawableRes val ProfileImage1:Int=R.drawable.m
+    @DrawableRes val ProfileImage2:Int=R.drawable.a
+    @DrawableRes val ProfileImage3:Int=R.drawable.b
+    @DrawableRes val ProfileImage4:Int=R.drawable.c
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(BackgroundColor)
+        .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(((-60)).dp)) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp),
+            painter = painterResource(id = R.drawable.tt),
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth
+        )
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(15.dp)) {
+            Image(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(120.dp),
+                painter = painterResource(id = R.drawable.rrr),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            Spacer(Modifier.size(15.dp))
+            Text(
+                text = "Greetings,",
+                fontSize = 15.sp,
+                style = MaterialTheme.typography.body1,
+                color = Color.White
+            )
+            Spacer(Modifier.size(10.dp))
+            Text(
+                text = "Name",
+                fontSize = 23.sp,
+                style = MaterialTheme.typography.h1,
+                color = Color.White
+            )
+            Spacer(Modifier.size(15.dp))
+                Card(
+                    Modifier
+                        .padding(5.dp),
+                    backgroundColor = CardColor,
+                    shape = MaterialTheme.shapes.large
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+
+                        Text(
+                            modifier = Modifier.padding(15.dp),
+                            text = "Profession",
+                            fontSize = 25.sp,
+                            style = MaterialTheme.typography.h2,
+                            color = Color.White
+                        )
+                        Text(
+                            modifier = Modifier.padding(15.dp),
+                            text = "Intrests",
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.body1,
+                            color = Color.White
+                        )
+                        Text(
+                            modifier = Modifier.padding(15.dp),
+                            text = "details",
+                            fontSize = 15.sp,
+                            style = MaterialTheme.typography.body1,
+                            color = Color.White
+                        )
+                    }
+                }
+            Spacer(Modifier.size(15.dp))
+            Card(
+                Modifier
+                    .padding(5.dp),
+                backgroundColor = CardColor,
+                shape = MaterialTheme.shapes.large
+            ) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
+                    .padding(30.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(Modifier) {
+                        Progressed(radius = 260, strokeWidth = 30.dp, list, colorList)
+                    }
+                    LazyColumn(state= rememberLazyListState()){
+                        items(count = CompanyName.size) {
+                            @DrawableRes val x: Int = when (it) {
+                                0 -> {
+                                    ProfileImage1
+                                }
+                                1 -> {
+                                    ProfileImage2
+                                }
+                                2 -> {
+                                    ProfileImage3
+                                }
+                                else -> {
+                                    ProfileImage4
+                                }
+                            }
+                            element(name = CompanyName[it], Pic = x)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 @Composable
@@ -65,10 +179,60 @@ fun UpperTab(state: Int, titles:List<String>, onStateChangedHai:(Int)->Unit){
     }
 }
 
+@Composable
+fun element(name:String,@DrawableRes Pic:Int){
+    Card(Modifier, backgroundColor = CardColor, shape = MaterialTheme.shapes.medium)  {
+        Row(Modifier) {
+            Image(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(50.dp),
+                painter = painterResource(id = Pic),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+            Text(
+                modifier = Modifier.padding(15.dp),
+                text = name,
+                fontSize = 25.sp,
+                style = MaterialTheme.typography.h2,
+                color = Color.White
+            )
+        }
+    }
+}
+@Composable
+fun Progressed(radius:Int,strokeWidth: Dp,list:MutableList<Float>,listColor:List<Color>) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(15.dp), verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        Canvas(
+            modifier = Modifier
+                .height(radius.dp)
+                .width(radius.dp)
+        ) {
+            var angle=-90f
+            val Sum=list.sum()
+            Log.d(Sum.toString(),"YESS")
+            for(i in 0 until list.size) {
+                drawArc(
+                    color = (listColor[(i%(listColor.size))]),
+                    angle,
+                    (360f*((list[i])/Sum)),
+                    useCenter = false,
+                    style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Butt),
+                )
+                angle+=(360f*(list[i]/Sum))
+            }
+        }
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun PreviewedHai() {
     StockMarketPricePredictor20Theme {
         HomePage()
+        //element(name = "RAJU", Pic = R.drawable.m)
     }
 }
