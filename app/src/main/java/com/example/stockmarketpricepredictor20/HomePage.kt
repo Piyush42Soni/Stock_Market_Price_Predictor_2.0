@@ -1,5 +1,6 @@
 package com.example.stockmarketpricepredictor20
 
+import android.graphics.drawable.shapes.Shape
 import android.media.Image
 import android.util.Log
 import androidx.annotation.DrawableRes
@@ -10,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataExploration
@@ -43,11 +45,7 @@ fun HomePage() {
         mutableStateListOf<Float>(10f, 20f, 120f, 60f)
     }
     val colorList=listOf<Color>(ProgressColor1, ProgressColor2, ProgressColor3, ProgressColor4)
-    val CompanyName=listOf<String>("C1","C2","C3","C4")
-    @DrawableRes val ProfileImage1:Int=R.drawable.m
-    @DrawableRes val ProfileImage2:Int=R.drawable.a
-    @DrawableRes val ProfileImage3:Int=R.drawable.b
-    @DrawableRes val ProfileImage4:Int=R.drawable.c
+    val CompanyName= listOf<String>("C1", "C2", "C3", "C4")
     Column(modifier = Modifier
         .fillMaxSize()
         .background(BackgroundColor)
@@ -121,34 +119,42 @@ fun HomePage() {
             Spacer(Modifier.size(15.dp))
             Card(
                 Modifier
-                    .padding(5.dp),
+                    .padding(5.dp)
+                    .height(700.dp),
                 backgroundColor = CardColor,
                 shape = MaterialTheme.shapes.large
             ) {
                 Column(modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
-                    .padding(30.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    .height(400.dp)
+                    .padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Column(Modifier) {
                         Progressed(radius = 260, strokeWidth = 30.dp, list, colorList)
                     }
-                    LazyColumn(state= rememberLazyListState()){
-                        items(count = CompanyName.size) {
-                            @DrawableRes val x: Int = when (it) {
-                                0 -> {
-                                    ProfileImage1
-                                }
-                                1 -> {
-                                    ProfileImage2
-                                }
-                                2 -> {
-                                    ProfileImage3
-                                }
-                                else -> {
-                                    ProfileImage4
+                    Spacer(modifier = Modifier.size(50.dp))
+                    Card(
+                        Modifier
+                            .padding(5.dp),
+                        backgroundColor = ElementColor,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        LazyColumn {
+                            items(count = 10) {
+                                when ((it%4)) {
+                                    0 -> {
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.m,colorList[(it%4)])
+                                    }
+                                    1 -> {
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.b,colorList[(it%4)])
+                                    }
+                                    2 -> {
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.c,colorList[(it%4)])
+                                    }
+                                    else -> {
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.a,colorList[(it%4)])
+                                    }
                                 }
                             }
-                            element(name = CompanyName[it], Pic = x)
                         }
                     }
                 }
@@ -180,9 +186,13 @@ fun UpperTab(state: Int, titles:List<String>, onStateChangedHai:(Int)->Unit){
 }
 
 @Composable
-fun element(name:String,@DrawableRes Pic:Int){
-    Card(Modifier, backgroundColor = CardColor, shape = MaterialTheme.shapes.medium)  {
-        Row(Modifier) {
+fun element(name:String,@DrawableRes Pic:Int,color:Color){
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 15.dp), backgroundColor = ElementColor, shape = MaterialTheme.shapes.medium)  {
+        Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
+            Card(Modifier.height(50.dp).padding(horizontal = 10.dp),backgroundColor=(color),shape= RoundedCornerShape(0.dp)){ Spacer(modifier = Modifier.width(20.dp))}
             Image(
                 modifier = Modifier
                     .clip(CircleShape)
@@ -191,8 +201,8 @@ fun element(name:String,@DrawableRes Pic:Int){
                 contentDescription = null,
                 contentScale = ContentScale.Crop
             )
+            Spacer(modifier = Modifier.size(15.dp))
             Text(
-                modifier = Modifier.padding(15.dp),
                 text = name,
                 fontSize = 25.sp,
                 style = MaterialTheme.typography.h2,
@@ -204,8 +214,7 @@ fun element(name:String,@DrawableRes Pic:Int){
 @Composable
 fun Progressed(radius:Int,strokeWidth: Dp,list:MutableList<Float>,listColor:List<Color>) {
     Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(15.dp), verticalArrangement = Arrangement.Center,
+        .padding(15.dp),
         horizontalAlignment = Alignment.CenterHorizontally) {
         Canvas(
             modifier = Modifier
@@ -234,5 +243,12 @@ fun PreviewedHai() {
     StockMarketPricePredictor20Theme {
         HomePage()
         //element(name = "RAJU", Pic = R.drawable.m)
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun Previewedai() {
+    StockMarketPricePredictor20Theme {
+        element(name = "RAJU", Pic = R.drawable.m, Color.Black)
     }
 }
