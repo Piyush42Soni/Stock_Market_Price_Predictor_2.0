@@ -79,7 +79,7 @@ val Typography = Typography(
     button = TextStyle(
         fontFamily = Orbitron,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
+        fontSize = 12.sp,
         letterSpacing = 1.sp
     ),
     caption = TextStyle(
