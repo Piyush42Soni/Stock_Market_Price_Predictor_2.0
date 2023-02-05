@@ -62,6 +62,7 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     StockMarketPricePredictor20Theme {
-        Greeting("Android")
+        val CompanyDetails=listOf<Float>(1f,2f,3f,4f,5f,6f,7f,8f,9f,10f,11f,12f,13f,14f,15f,16f)
+        Details(CompanyDetails)
     }
 }
