@@ -4,10 +4,9 @@ import android.graphics.Paint
 import android.graphics.PointF
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataExploration
@@ -110,8 +109,9 @@ fun ComparePage(comparePageViewModel: ComparePageViewModel) {
     }
     Column(modifier = Modifier
         .fillMaxWidth()
-        .background(BackgroundColor)) {
-        segmentedButton(list = list, state = state, onStateChange = {state=it})
+        .background(BackgroundColor)
+        .verticalScroll(rememberScrollState())) {
+        segmentedButton(list = list, state = state, onStateChange = { state = it })
         Spacer(modifier = Modifier.size(15.dp))
         val switchState = remember {
             mutableStateOf(false)
@@ -119,10 +119,18 @@ fun ComparePage(comparePageViewModel: ComparePageViewModel) {
         var mSelectedText by remember { mutableStateOf("") }
         Spacer(modifier = Modifier.size(15.dp))
         var mSelectedText2 by remember { mutableStateOf("") }
-        MyContent(label1 = "Company1",mSelectedText,{mSelectedText=it})
-        MyContent(label1 = "Company2",mSelectedText2,{mSelectedText2=it})
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-            Icon(tint = Color.White, imageVector = Icons.Filled.DataExploration, contentDescription = null)
+        MyContent(label1 = "Company1", mSelectedText, { mSelectedText = it })
+        MyContent(label1 = "Company2", mSelectedText2, { mSelectedText2 = it })
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                tint = Color.White,
+                imageVector = Icons.Filled.DataExploration,
+                contentDescription = null
+            )
             Switch(
                 checked = switchState.value,
                 onCheckedChange = { switchState.value = it },
@@ -143,7 +151,7 @@ fun ComparePage(comparePageViewModel: ComparePageViewModel) {
                 comparePageViewModel.name.value?.let {
                     comparePageViewModel.name1.value?.let { it1 ->
                         comparePageViewModel.name2.value?.let { it2 ->
-                            CompareGraph1hai(it,it1,it2)
+                            CompareGraph1hai(it, it1, it2)
                         }
                     }
                 }
@@ -151,14 +159,77 @@ fun ComparePage(comparePageViewModel: ComparePageViewModel) {
                 comparePageViewModel.name.value?.let {
                     comparePageViewModel.name1.value?.let { it1 ->
                         comparePageViewModel.name2.value?.let { it2 ->
-                            CompareGraphhai(it,it1,it2)
+                            CompareGraphhai(it, it1, it2)
+                        }
+                    }
+                }
+            }
+        }
+            Spacer(modifier = Modifier.size(15.dp))
+            Card(
+                Modifier
+                    .padding(5.dp)
+                    .height(700.dp),
+                backgroundColor = CardColor,
+                shape = MaterialTheme.shapes.large
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                        .padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val colorList=listOf<Color>(Purple200,Teal200)
+                    val list6= mutableListOf(100f,300f)
+                    Column(Modifier) {
+                        Progressed(radius = 260, strokeWidth = 30.dp, list6, colorList)
+                    }
+                    Spacer(modifier = Modifier.size(50.dp))
+                    Card(
+                        Modifier
+                            .padding(5.dp),
+                        backgroundColor = ElementColor,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        LazyColumn {
+                            item() {
+                                when ((mSelectedText)) {
+                                    "C1" -> {
+                                        element(name = mSelectedText, Pic = R.drawable.m, Purple200)
+                                    }
+                                    "C2" -> {
+                                        element(name = mSelectedText, Pic = R.drawable.a, Purple200)
+                                    }
+                                    "C3" -> {
+                                        element(name = mSelectedText, Pic = R.drawable.b, Purple200)
+                                    }
+                                    else -> {
+                                        element(name = mSelectedText, Pic = R.drawable.c, Purple200)
+                                    }
+                                }
+                            }
+                            item() {
+                                when ((mSelectedText2)) {
+                                    "C1" -> {
+                                        element(name = mSelectedText2, Pic = R.drawable.m, Teal200)
+                                    }
+                                    "C2" -> {
+                                        element(name = mSelectedText2, Pic = R.drawable.a, Teal200)
+                                    }
+                                    "C3" -> {
+                                        element(name = mSelectedText2, Pic = R.drawable.b, Teal200)
+                                    }
+                                    else -> {
+                                        element(name = mSelectedText2, Pic = R.drawable.c, Teal200)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 
 @Composable
 fun MyContent(label1:String,mSelectedText:String,onmSelectedTextChange:(String)->Unit){
