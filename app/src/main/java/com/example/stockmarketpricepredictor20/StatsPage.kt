@@ -2,7 +2,10 @@ package com.example.stockmarketpricepredictor20
 
 
 import android.graphics.Paint
+import android.graphics.PointF
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,13 +22,10 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -413,11 +413,11 @@ fun Graphhai(list: List<Float>,list2:List<String>){
     }
 }
 @Composable
-fun Graph1hai(list: List<Float>,list2:List<String>){
-    val list1=listOf("$250","$200","$150","$100","$50","$0")
-    var canvasHeight=0f
-    var canvasWidth=0f
-    var columnWidth=0f
+fun Graph1hai(list: List<Float>,list2:List<String>) {
+    val list1 = listOf("$250", "$200", "$150", "$100", "$50", "$0")
+    var canvasHeight = 0f
+    var canvasWidth = 0f
+    var columnWidth = 0f
     Column() {
         Row(Modifier.padding(15.dp)) {
             Column(
@@ -431,6 +431,13 @@ fun Graph1hai(list: List<Float>,list2:List<String>){
             Spacer(modifier = Modifier.size(10.dp))
             Column() {
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                    val animationProgress = remember {
+                        Animatable(0f)
+                    }
+
+                    LaunchedEffect(key1 = list, block = {
+                        animationProgress.animateTo(1f, tween(3000))
+                    })
                     Canvas(
                         modifier = Modifier
                             .height(350.dp)
@@ -438,6 +445,13 @@ fun Graph1hai(list: List<Float>,list2:List<String>){
                     ) {
                         canvasHeight = 300.dp.toPx()
                         canvasWidth = size.width
+                        val numberEntries = list.size - 1
+                        val weekWidth = canvasWidth / numberEntries
+                        var previousBalanceX = 0f
+                        var previousBalanceY = canvasHeight
+                        val max = list.maxBy { it }
+                        val range = max
+                        val heightPxPerAmount = canvasHeight / 250f
                         drawLine(
                             start = Offset(x = 0f, y = 0f),
                             end = Offset(x = 0f, y = canvasHeight),
@@ -445,74 +459,90 @@ fun Graph1hai(list: List<Float>,list2:List<String>){
                             strokeWidth = 5f
                         )
                         var space = 30f
-                        for (i in 0..list.size-2) {
-                            drawLine(
-                                start =  Offset(
-                                    x = space,
-                                    y = (canvasHeight - ((canvasHeight / 250f) * list[i]))
-                                ),
-                                end=Offset(
-                                    x = space+ (java.lang.Float.max(1f, ((canvasWidth / list.size)))),
-                                    y = (canvasHeight - ((canvasHeight / 250f) * list[i+1]))
-                                ),
-                                color = Teal200,
-                                strokeWidth = 10f
-                            )
-                            val rect = Rect(
-                                Offset(
-                                    x = space,
-                                    y = (canvasHeight)+40f
-                                ), size)
-                            drawIntoCanvas { canvas ->
-                                rotate(degrees = 90f, Offset(
-                                    x = space,
-                                    y = (canvasHeight)+40f)
-                                ) {
-                                    canvas.nativeCanvas.drawText(
-                                        list2[i],
-                                        rect.left, rect.top,
-                                        Paint().apply {
-                                            color = Color.White.toArgb()
-                                            textSize =
-                                                if(list2.size>20){20f}
-                                                else{50f}
-                                        }
-                                    )
-                                }
-                            }
-                            space += (java.lang.Float.max(1f, ((canvasWidth / list.size))))
-                        }
-                        val rect = Rect(
-                            Offset(
-                                x = space,
-                                y = (canvasHeight)+40f
-                            ), size)
-                        drawIntoCanvas { canvas ->
-                            rotate(degrees = 90f, Offset(
-                                x = space,
-                                y = (canvasHeight)+40f)
-                            ) {
-                                canvas.nativeCanvas.drawText(
-                                    list2[list2.size-1],
-                                    rect.left, rect.top,
-                                    Paint().apply {
-                                        color = Color.White.toArgb()
-                                        textSize =
-                                            if(list2.size>20){20f}
-                                            else{50f}
-                                    }
+                        val path = Path()
+                        val FilledPath=Path()
+                        FilledPath.moveTo(0f,canvasHeight)
+                        path.moveTo(0f,canvasHeight)
+                        for (i in 0..list.size - 1) {
+                                val balanceX = i * weekWidth
+                                val balanceY = canvasHeight - (list[i]) * heightPxPerAmount
+                                val controlPoint1 =
+                                    PointF((balanceX + previousBalanceX) / 2f, previousBalanceY)
+                                val controlPoint2 =
+                                    PointF((balanceX + previousBalanceX) / 2f, balanceY)
+                                path.cubicTo(
+                                    controlPoint1.x,
+                                    controlPoint1.y,
+                                    controlPoint2.x,
+                                    controlPoint2.y,
+                                    balanceX,
+                                    balanceY
                                 )
+                                FilledPath.cubicTo(
+                                    controlPoint1.x,
+                                    controlPoint1.y,
+                                    controlPoint2.x,
+                                    controlPoint2.y,
+                                    balanceX,
+                                    balanceY
+                                )
+                                val rect = Rect(
+                                    Offset(
+                                        x = balanceX,
+                                        y = (canvasHeight) + 40f
+                                    ), size
+                                )
+                                drawIntoCanvas { canvas ->
+                                    rotate(
+                                        degrees = 90f, Offset(
+                                            x = balanceX - 20f,
+                                            y = (canvasHeight) + 40f
+                                        )
+                                    ) {
+                                        canvas.nativeCanvas.drawText(
+                                            list2[i],
+                                            rect.left, rect.top,
+                                            Paint().apply {
+                                                color = Color.White.toArgb()
+                                                textSize =
+                                                    if (list2.size > 20) {
+                                                        20f
+                                                    } else {
+                                                        50f
+                                                    }
+                                            }
+                                        )
+                                    }
+                                previousBalanceX = balanceX
+                                previousBalanceY = balanceY
+                                space += (java.lang.Float.max(1f, ((canvasWidth / list.size))))
                             }
                         }
-                        space += (java.lang.Float.max(1f, ((canvasWidth / list.size))))
                         drawLine(
                             start = Offset(x = 0f, y = canvasHeight),
                             end = Offset(x = canvasWidth, y = canvasHeight),
                             color = Color.Black,
                             strokeWidth = 5f
                         )
-                    }
+                        FilledPath.relativeLineTo(0f, canvasHeight)
+                        FilledPath.lineTo(canvasWidth, canvasHeight)
+                        FilledPath.close()
+                        clipRect(right = canvasWidth * animationProgress.value) {
+                            drawPath(path, Color.Green, style = Stroke(2.dp.toPx()))
 
+                            drawPath(
+                                FilledPath,
+                                brush = Brush.verticalGradient(
+                                    listOf(
+                                        Color.Green.copy(alpha = 0.4f),
+                                        Color.Transparent
+                                    )
+                                ),
+                                style = Fill
+                            )
+                        }
+
+                    }
                 }
             }
         }
