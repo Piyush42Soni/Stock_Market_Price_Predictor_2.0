@@ -25,7 +25,7 @@ import com.example.stockmarketpricepredictor20.ui.theme.BackgroundColor
 import com.example.stockmarketpricepredictor20.ui.theme.buttonTextColor
 
 @Composable
-fun LoginPage() {
+fun LoginPage(onSendButtonClicked : () -> Unit) {
     Column(modifier = Modifier
         .fillMaxSize()
         .background(BackgroundColor)
@@ -84,7 +84,17 @@ fun LoginPage() {
             }
         }
         Spacer(modifier = Modifier.size(45.dp))
-        Button(modifier = Modifier.fillMaxWidth().padding(horizontal=55.dp),onClick = { /*TODO*/ }, shape = MaterialTheme.shapes.small) {
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal=55.dp),
+            onClick = {
+                if(username=="YOHO" && password=="YOHO") {
+                    onSendButtonClicked()
+                }
+            }
+            , shape = MaterialTheme.shapes.small
+        ) {
             Text(text="Login",fontSize=25.sp,style=MaterialTheme.typography.button, color = buttonTextColor)
         }
         Button(modifier = Modifier
@@ -103,6 +113,6 @@ fun LoginPage() {
 @Composable
 fun Previewed() {
     StockMarketPricePredictor20Theme {
-        LoginPage()
+        LoginPage(onSendButtonClicked = {})
     }
 }
