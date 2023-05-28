@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Stock Market Price Predictor 2.0</string>
-    <string name="Compare">ComparePage</string>
-    <string name="Login">LoginPage</string>
-    <string name="Stats">StatsPage</string>
+    <string name="Compare">Compare</string>
+    <string name="Login">Login</string>
+    <string name="Stats">Stats</string>
     <string name="new_stock_prediction">Todays Stock Prediction</string>
 </resources>

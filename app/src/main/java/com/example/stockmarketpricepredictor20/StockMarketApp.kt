@@ -58,7 +58,7 @@ enum class StockScreen(@StringRes val title: Int) {
     Home(title = R.string.app_name),
     Compare(title = R.string.Compare),
     Login(title = R.string.Login),
-    Stats(title = R.string.Login)
+    Stats(title = R.string.Stats)
 }
 @Composable
 fun StockTopAppBar(
@@ -68,7 +68,7 @@ fun StockTopAppBar(
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
-        title = { Text(stringResource(currentScreen.title)) },
+        title = { AdjustText(text=(stringResource(currentScreen.title)), textStyleBody1 = MaterialTheme.typography.h6, color = Color.White) },
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
@@ -89,29 +89,82 @@ fun StockBottomAppBar(
     HomeNavigate:() -> Unit,
     CompareNavigate:() -> Unit,
     StatsNavigate:() -> Unit,
+    active:Int
 ) {
     BottomAppBar(modifier = modifier,){
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+        if(active==1) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
 
+                IconButton(onClick = { HomeNavigate() }) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Filled.Home, contentDescription = "Localized description")
+                        Text(text = "Home")
+                    }
+                }
+            }
+        }
+        else{
             IconButton(onClick = { HomeNavigate() }) {
-                Column(horizontalAlignment =Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Icon(Icons.Filled.Home, contentDescription = "Localized description")
                     Text(text = "Home")
                 }
             }
         }
         Spacer(Modifier.weight(0.5f, true))
-        IconButton(onClick = { CompareNavigate() }) {
-            Column(horizontalAlignment =Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                Icon(Icons.Filled.Compare, contentDescription = "Localized description")
-                Text(text = "Compare")
+        if(active==2) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                IconButton(onClick = { CompareNavigate() }) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Filled.Compare, contentDescription = "Localized description")
+                        Text(text = "Compare")
+                    }
+                }
+            }
+        }
+        else{
+            IconButton(onClick = { CompareNavigate() }) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(Icons.Filled.Compare, contentDescription = "Localized description")
+                    Text(text = "Compare")
+                }
             }
         }
         Spacer(Modifier.weight(0.5f, true))
-        IconButton(onClick = { StatsNavigate() }) {
-            Column(horizontalAlignment =Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
-                Text(text = "Stats")
+        if(active==3) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+                IconButton(onClick = { StatsNavigate() }) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
+                        Text(text = "Stats")
+                    }
+                }
+            }
+        }
+        else{
+            IconButton(onClick = { StatsNavigate() }) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
+                    Text(text = "Stats")
+                }
             }
         }
     }
@@ -122,6 +175,7 @@ fun StockMarketApp(
 ) {
     val bottomBarState = rememberSaveable { (mutableStateOf(false)) }
     val topBarState = rememberSaveable { (mutableStateOf(false)) }
+    val currentActive=rememberSaveable { (mutableStateOf(0)) }
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = StockScreen.valueOf(
         backStackEntry?.destination?.route ?: StockScreen.Login.name
@@ -145,7 +199,8 @@ fun StockMarketApp(
                     },
                     CompareNavigate = {
                         navController.navigate(StockScreen.Compare.name)
-                    }
+                    },
+                    active = currentActive.value
                 )
             }
         }
@@ -163,23 +218,27 @@ fun StockMarketApp(
                     HomePage()
                     bottomBarState.value=true
                     topBarState.value=true
+                    currentActive.value=1
                 }
                 composable(route = StockScreen.Compare.name) {
                     val comparePageViewModel: ComparePageViewModel = viewModel()
                     ComparePage(comparePageViewModel)
                     bottomBarState.value=true
                     topBarState.value=true
+                    currentActive.value=2
                 }
                 composable(route = StockScreen.Login.name) {
                     LoginPage(onSendButtonClicked = { navController.navigate(StockScreen.Home.name) })
                     bottomBarState.value=false
                     topBarState.value=false
+                    currentActive.value=0
                 }
                 composable(route = StockScreen.Stats.name) {
                     val statsViewModel: StatsViewModel = viewModel()
                     StatsPage(statsViewModel)
                     bottomBarState.value=true
                     topBarState.value=true
+                    currentActive.value=3
                 }
             }
         }
