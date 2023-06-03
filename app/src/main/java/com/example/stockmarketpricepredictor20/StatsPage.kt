@@ -1,11 +1,15 @@
 package com.example.stockmarketpricepredictor20
 
 
+import android.annotation.SuppressLint
+import android.content.res.Resources.Theme
 import android.graphics.Paint
 import android.graphics.PointF
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +30,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.drawscope.*
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,6 +70,27 @@ fun StatsPage(statsViewModel: StatsViewModel) {
         .fillMaxSize()
         .padding(15.dp)
         .verticalScroll(rememberScrollState())) {
+        AdjustText("Company Name",textStyleBody1= Typography.h4, color = HeadingColor)
+        Spacer(
+            Modifier
+                .fillMaxWidth()
+                .height(10.dp))
+        Divider(
+            color = Teal200,
+            modifier = Modifier //fill the max height
+                .fillMaxWidth()
+                .height(2.dp)
+        )
+        Spacer(
+            Modifier
+                .fillMaxWidth()
+                .height(20.dp))
+        AdjustText("2000.0",textStyleBody1= Typography.h3, color = Color.White)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Triangle(radius = 50)
+            AdjustText(text = "+44.5(1.75%)",color= Color.Green, textStyleBody1 = Typography.h6)
+        }
+
         segmentedButton(list = list, state =state , onStateChange = {state=it})
         var list3:List<String> =when(state){
             0-> listOf("9:00","11:00","13:00","15:00","17:00")
@@ -318,39 +344,36 @@ fun AdjustText(text:String, color:Color= Black, textStyleBody1: androidx.compose
         }
     )
 }
-
+@SuppressLint("RememberReturnType")
 @Composable
 fun Graphhai(list: List<Float>,list2:List<String>){
-    val list1=listOf("$250","$200","$150","$100","$50","$0")
+    val list1=listOf("$0","$50","$100","$150","$200","$250")
     var canvasHeight=0f
     var canvasWidth=0f
     var columnWidth=0f
     Column() {
+        var state:Float by remember {
+            mutableStateOf(200.0f)
+        }
         Row(Modifier.padding(15.dp)) {
-            Column(
-                modifier = Modifier.height(300.dp),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                for (i in list1.indices) {
-                    Text(text = list1[i], color = White, fontSize = 13.sp)
-                }
-            }
-            Spacer(modifier = Modifier.size(10.dp))
+//            Column(
+//                modifier = Modifier.height(state.dp),
+//                verticalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                for (i in list1.indices) {
+//                    Text(text = list1[i], color = White, fontSize = 13.sp)
+//                }
+//            }
+//            Spacer(modifier = Modifier.size(10.dp))
             Column() {
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Canvas(
                         modifier = Modifier
-                            .height(350.dp)
-                            .fillMaxWidth()
+                            .height(200.dp)
+                            .weight(0.95f)
                     ) {
-                        canvasHeight = 300.dp.toPx()
+                        canvasHeight = size.width/2
                         canvasWidth = size.width
-                        drawLine(
-                            start = Offset(x = 0f, y = 0f),
-                            end = Offset(x = 0f, y = canvasHeight),
-                            color = Color.Black,
-                            strokeWidth = 5f
-                        )
                         var space = 30f
                         for (i in list.indices) {
                             drawRoundRect(
@@ -405,8 +428,46 @@ fun Graphhai(list: List<Float>,list2:List<String>){
                             color = Color.Black,
                             strokeWidth = 5f
                         )
+                        drawLine(
+                            start = Offset(x = canvasWidth, y = 0f),
+                            end = Offset(x = canvasWidth, y = canvasHeight),
+                            color = Color.Black,
+                            strokeWidth = 5f
+                        )
                     }
-
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Canvas(
+                        modifier = Modifier
+                            .height(canvasHeight.dp)
+                            .width(50.dp)
+                    ) {
+                        canvasWidth = size.width
+                        var space = 0f
+                        for (i in list1.indices) {
+                            val rect1 = Rect(Offset(
+                                x = 0f,
+                                y = canvasHeight-space
+                            ), size)
+                            drawIntoCanvas { canvas ->
+                                rotate(
+                                    degrees = 0f, Offset(
+                                        x = 0f,
+                                        y = (canvasHeight) - space
+                                    )
+                                ) {
+                                    canvas.nativeCanvas.drawText(
+                                        list1[i],
+                                        rect1.left, rect1.top,
+                                        Paint().apply {
+                                            color = Color.White.toArgb()
+                                            textSize = 50f
+                                        }
+                                    )
+                                }
+                            }
+                            space += (max(1f, ((canvasHeight / list1.size))))
+                        }
+                    }
                 }
             }
         }
@@ -420,14 +481,14 @@ fun Graph1hai(list: List<Float>,list2:List<String>) {
     var columnWidth = 0f
     Column() {
         Row(Modifier.padding(15.dp)) {
-            Column(
-                modifier = Modifier.height(300.dp),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                for (i in list1.indices) {
-                    Text(text = list1[i], color = Color.White, fontSize = 13.sp)
-                }
-            }
+//            Column(
+//                modifier = Modifier.height(300.dp),
+//                verticalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                for (i in list1.indices) {
+//                    Text(text = list1[i], color = Color.White, fontSize = 13.sp)
+//                }
+//            }
             Spacer(modifier = Modifier.size(10.dp))
             Column() {
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
@@ -441,9 +502,9 @@ fun Graph1hai(list: List<Float>,list2:List<String>) {
                     Canvas(
                         modifier = Modifier
                             .height(350.dp)
-                            .fillMaxWidth()
+                            .weight(0.9f)
                     ) {
-                        canvasHeight = 300.dp.toPx()
+                        canvasHeight = size.width/2
                         canvasWidth = size.width
                         val numberEntries = list.size - 1
                         val weekWidth = canvasWidth / numberEntries
@@ -545,6 +606,39 @@ fun Graph1hai(list: List<Float>,list2:List<String>) {
                     }
                 }
             }
+            Spacer(modifier = Modifier.width(10.dp))
+            Canvas(
+                modifier = Modifier
+                    .height(canvasHeight.dp)
+                    .width(50.dp)
+            ) {
+                canvasWidth = size.width
+                var space = 0f
+                for (i in list1.indices) {
+                    val rect1 = Rect(Offset(
+                        x = 0f,
+                        y = canvasHeight-space
+                    ), size)
+                    drawIntoCanvas { canvas ->
+                        rotate(
+                            degrees = 0f, Offset(
+                                x = 0f,
+                                y = (canvasHeight) - space
+                            )
+                        ) {
+                            canvas.nativeCanvas.drawText(
+                                list1[i],
+                                rect1.left, rect1.top,
+                                Paint().apply {
+                                    color = Color.White.toArgb()
+                                    textSize = 50f
+                                }
+                            )
+                        }
+                    }
+                    space += (max(1f, ((canvasHeight / list1.size))))
+                }
+            }
         }
     }
 }
@@ -561,7 +655,10 @@ fun Details(list:List<Float>){
         Column(){
             for(i in 0..14){
                 Row(modifier = Modifier.fillMaxWidth()){
-                    Column(Modifier.padding(15.dp).weight(0.5f)) {
+                    Column(
+                        Modifier
+                            .padding(15.dp)
+                            .weight(0.5f)) {
                         Text(list1[i], color = Teal200)
                         Spacer(modifier = Modifier.size(5.dp))
                         Text(
@@ -571,7 +668,10 @@ fun Details(list:List<Float>){
                         )
                         Spacer(modifier = Modifier.size(30.dp))
                     }
-                    Column(Modifier.padding(15.dp).weight(0.5f)) {
+                    Column(
+                        Modifier
+                            .padding(15.dp)
+                            .weight(0.5f)) {
                         Text(list1[i+1], color = Teal200)
                         Spacer(modifier = Modifier.size(5.dp))
                         Text(
@@ -595,7 +695,10 @@ fun Sharelement(name:String, @DrawableRes Pic:Int, color:Color){
             .fillMaxWidth()
             .padding(vertical = 15.dp), backgroundColor = ElementColor, shape = MaterialTheme.shapes.medium)  {
         Row(Modifier, verticalAlignment = Alignment.CenterVertically) {
-            Card(Modifier.height(50.dp).padding(horizontal = 10.dp),backgroundColor=(color),shape= RoundedCornerShape(0.dp)){ Spacer(modifier = Modifier.width(20.dp))}
+            Card(
+                Modifier
+                    .height(50.dp)
+                    .padding(horizontal = 10.dp),backgroundColor=(color),shape= RoundedCornerShape(0.dp)){ Spacer(modifier = Modifier.width(20.dp))}
             Spacer(modifier = Modifier.size(15.dp))
             Text(
                 text = name,
@@ -603,6 +706,40 @@ fun Sharelement(name:String, @DrawableRes Pic:Int, color:Color){
                 style = MaterialTheme.typography.h2,
                 color = Color.White
             )
+        }
+    }
+}
+@Composable
+fun Triangle(radius:Int) {
+    Column() {
+        Canvas(
+            modifier = Modifier
+                .height(radius.dp)
+                .width(radius.dp)
+        ) {
+            val size = (radius / 1.3).dp.toPx()
+            val trianglePath = Path().apply {
+                // Moves to top center position
+                moveTo((size + 10.dp.toPx()) / 1.8f, (size - 10.dp.toPx()) / 2f)
+                // Add line to bottom right corner
+                lineTo(
+                    (size + 10.dp.toPx()) / 1.8f + 10.dp.toPx(),
+                    size - 10.dp.toPx()
+                )
+                // Add line to bottom left corner
+                lineTo(
+                    (size + 10.dp.toPx()) / 1.8f - 10.dp.toPx(),
+                    size - 10.dp.toPx()
+                )
+            }
+            drawIntoCanvas { canvas ->
+                canvas.drawOutline(
+                    outline = Outline.Generic(trianglePath),
+                    paint = androidx.compose.ui.graphics.Paint().apply {
+                        color = Color.Green
+                    }
+                )
+            }
         }
     }
 }
