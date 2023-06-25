@@ -215,7 +215,8 @@ fun StockMarketApp(
                     .padding(innerPadding)
             ) {
                 composable(route = StockScreen.Home.name) {
-                    HomePage()
+                    val homeViewModel: HomeViewModel = viewModel()
+                    HomePage(StockUiState = homeViewModel.stockUiState)
                     bottomBarState.value=true
                     topBarState.value=true
                     currentActive.value=1

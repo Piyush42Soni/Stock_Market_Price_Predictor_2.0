@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stockmarketpricepredictor20.ui.theme.*
 
 @Composable
@@ -241,7 +242,8 @@ fun Progressed(radius:Int,strokeWidth: Dp,list:MutableList<Float>,listColor:List
 @Composable
 fun PreviewedHai() {
     StockMarketPricePredictor20Theme {
-        HomePage()
+        val homeViewModel: HomeViewModel = viewModel()
+        HomePage(StockUiState = homeViewModel.stockUiState)
         //element(name = "RAJU", Pic = R.drawable.m)
     }
 }
