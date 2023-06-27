@@ -39,7 +39,7 @@ import java.lang.Integer.min
 @Composable
 fun HomePage(
     homeViewModel: HomeViewModel, modifier: Modifier = Modifier,
-    onPageChange: (CurrentData) -> Unit
+    onPageChange: (String,String,Float) -> Unit
 ) {
     val SymbolList= listOf<String>("ADANIENT.NS","ADANIPORTS.NS","APOLLOHOSP.NS","ASIANPAINT.NS","AXISBANK.NS","BAJAJ-AUTO.NS","BAJAJFINSV.NS","BAJFINANCE.NS","BHARTIARTL.NS","BPCL.NS","BRITANNIA.NS","CIPLA.NS","COALINDIA.NS","DIVISLAB.NS","DRREDDY.NS","EICHERMOT.NS","GAIL.NS","GRASIM.NS","HCLTECH.NS","HDFC.NS","HDFCBANK.NS","HDFCLIFE.NS","HEROMOTOCO.NS","HINDALCO.NS","HINDUNILVR.NS","ICICIBANK.NS","INDUSINDBK.NS","INFY.NS","ITC.NS","JSWSTEEL.NS","KOTAKBANK.NS","LT.NS","M&M.NS","MARUTI.NS","NESTLEIND.NS","NTPC.NS","ONGC.NS","POWERGRID.NS","RELIANCE.NS","SBILIFE.NS","SBIN.NS","SUNPHARMA.NS","TATACONSUM.NS","TATASTEEL.NS","TCS.NS","TECHM.NS","TITN.NS","ULTRACEMCO.NS","UPL.NS","WIPRO.NS")
     var b1 by rememberSaveable {
@@ -81,8 +81,8 @@ fun HomePage(
                         .fillMaxWidth()
                         .padding(20.dp)
                         .clickable {
-                            (priceList[it]).companyName=SymbolList[it]
-                            onPageChange(priceList[it])
+                            val companyName=SymbolList[it]
+                            onPageChange(priceList[it].quoteSummary.result[0].financialData.currentPrice.raw.toString(),companyName,priceList[it].quoteSummary.result[0].financialData.earningsGrowth.raw)
                         }
                 ) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

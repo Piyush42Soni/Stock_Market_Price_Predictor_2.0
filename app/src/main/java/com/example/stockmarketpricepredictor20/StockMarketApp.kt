@@ -217,8 +217,10 @@ fun StockMarketApp(
             ) {
                 composable(route = StockScreen.Home.name) {
                     val homeViewModel: HomeViewModel = viewModel()
-                    HomePage(homeViewModel, onPageChange = {
+                    HomePage(homeViewModel, onPageChange = {it,it1,it2->
                         statsViewModel.currentData=it
+                        statsViewModel.companyName=it1
+                        statsViewModel.gworth=it2
                         navController.navigate(StockScreen.Stats.name)
                     })
                     bottomBarState.value=true

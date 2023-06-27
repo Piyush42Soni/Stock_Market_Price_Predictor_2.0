@@ -2,7 +2,6 @@ package com.example.stockmarketpricepredictor20
 
 
 import android.annotation.SuppressLint
-import android.content.res.Resources.Theme
 import android.graphics.Paint
 import android.graphics.PointF
 import androidx.annotation.DrawableRes
@@ -19,6 +18,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DataExploration
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -30,211 +30,307 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.drawscope.*
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.stockmarketpricepredictor20.data.CurrentData
 import com.example.stockmarketpricepredictor20.ui.theme.*
 import java.lang.Float.max
 import java.util.*
 
-class StatsViewModel:ViewModel(){
-    var currentData:CurrentData  by mutableStateOf(CurrentData())
-    private val _name=MutableLiveData<List<Float>>()
-    val name=_name
-    private val _name1=MutableLiveData<List<String>>()
-    val name1=_name1
-    fun onNameChange(newList: List<Float>){
-        _name.value=newList
-    }
-    fun onName1Change(newList: List<String>){
-        _name1.value=newList
-    }
-}
+
 @Composable
 fun StatsPage(statsViewModel: StatsViewModel) {
-    val ShareHoldinglist = remember {
-        mutableStateListOf<Float>(10f, 20f, 120f, 60f)
+    LaunchedEffect(Unit){
+        statsViewModel.getSymbol(statsViewModel.companyName)
     }
-    val list= listOf<String>("1D","1W","1M","1Y","Max")
-    val CompanyName= listOf<String>("Promoters", "FII", "DII", "Public")
-    val CompanyName1= listOf<String>("C1", "C2", "C3", "C4")
-    val colorList=listOf(ProgressColor1, ProgressColor2, ProgressColor3, ProgressColor4)
-    var state by remember {
-        mutableStateOf(0)
-    }
-    Column(modifier = Modifier
-        .background(BackgroundColor)
-        .fillMaxSize()
-        .padding(15.dp)
-        .verticalScroll(rememberScrollState())) {
-        AdjustText(statsViewModel.currentData.companyName,textStyleBody1= Typography.h4, color = HeadingColor)
-        Spacer(
-            Modifier
-                .fillMaxWidth()
-                .height(10.dp))
-        Divider(
-            color = Teal200,
-            modifier = Modifier //fill the max height
-                .fillMaxWidth()
-                .height(2.dp)
-        )
-        Spacer(
-            Modifier
-                .fillMaxWidth()
-                .height(20.dp))
-        AdjustText(statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.currentPrice?.raw.toString(),textStyleBody1= Typography.h3, color = Color.White)
-        if(statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw!! >=0f) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Triangle(radius = 50)
-                AdjustText(
-                    text = "+$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
-                    color = Color.Green,
-                    textStyleBody1 = Typography.h6
-                )
-            }
+    when (statsViewModel.stockUiState) {
+    is StockUiState1.Success-> {
+        val shareHoldinglist = remember {
+            mutableStateListOf<Float>(10f, 20f, 120f, 60f)
         }
-        else{
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Triangle(radius = 50)
-                AdjustText(
-                    text = "-$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
-                    color = Color.Red,
-                    textStyleBody1 = Typography.h6
-                )
-            }
-        }
-        segmentedButton(list = list, state =state , onStateChange = {state=it})
-        val list3:List<String> =when(state){
-            0-> listOf("9:00","11:00","13:00","15:00","17:00")
-            1->listOf("Mon","Tue","Wed","Thu","Fri")
-            2->listOf("1","2","3","4","5","6","7","8","9","10",
-                "11","12","13","14","15","16","17","18","19","20"
-            ,"21","22","23","24","25","26","27","28","29","30")
-            3->listOf("Jan","Feb","March","April","May","June","July","Aug","Sep","Oct","Nov","Dec")
-            else->listOf("2018","2019","2020","2021","2022")
-        }
-        val CompanyDetails=listOf<Float>(1f,2f,3f,4f,5f,6f,7f,8f,9f,10f,11f,12f,13f,14f,15f,16f)
-        val list2:MutableList<Float> = mutableListOf<Float>()
-        when(state){
-            0->{
-                for(i in 1..5){
-                    val rd = Random() // creating Random object
-                    list2.add((rd.nextFloat()*250f))
-                }
-            }
-            1->{
-                for(i in 1..5){
-                    val rd = Random() // creating Random object
-                    list2.add((rd.nextFloat()*250f))
-                }
-            }
-            2->{
-                for(i in 1..30){
-                    val rd = Random() // creating Random object
-                    list2.add((rd.nextFloat()*250f))
-                }
-            }
-            3->{
-                for(i in 1..12){
-                    val rd = Random() // creating Random object
-                    list2.add((rd.nextFloat()*250f))
-                }
-            }
-            else->{
-                for(i in 1..5){
-                    val rd = Random() // creating Random object
-                    list2.add((rd.nextFloat()*250f))
-                }
-            }
-        }
-        statsViewModel.onNameChange(list2)
-        statsViewModel.onName1Change(list3)
-        Spacer(modifier = Modifier.size(15.dp))
-        val switchState = remember {
-            mutableStateOf(false)
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-            Icon(tint = White, imageVector = Icons.Filled.DataExploration, contentDescription = null)
-            Switch(
-                checked = switchState.value,
-                onCheckedChange = { switchState.value = it },
-                modifier = Modifier.size(50.dp),
-                colors = SwitchDefaults.colors(uncheckedThumbColor = White)
 
+        val list = listOf<String>("1D", "1W", "1M", "1Y", "Max")
+        val companyName = listOf<String>("Promoters", "FII", "DII", "Public")
+        val companyName1 = listOf<String>("C1", "C2", "C3", "C4")
+        val colorList = listOf(ProgressColor1, ProgressColor2, ProgressColor3, ProgressColor4)
+        var state by remember {
+            mutableStateOf(0)
+        }
+
+        Column(
+            modifier = Modifier
+                .background(BackgroundColor)
+                .fillMaxSize()
+                .padding(15.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            AdjustText(
+                statsViewModel.companyName,
+                textStyleBody1 = Typography.h4,
+                color = HeadingColor
             )
-        }
-        Card(
-            Modifier
-                .padding(5.dp),
-            backgroundColor = CardColor,
-            shape = MaterialTheme.shapes.large
-        ) {
-            if(switchState.value) {
-                statsViewModel.name.value?.let {
-                    statsViewModel.name1.value?.let { it1 ->
-                        Graph1hai(
-                            list = it,
-                            list2 = it1
-                        )
-                    }
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+            )
+            Divider(
+                color = Teal200,
+                modifier = Modifier //fill the max height
+                    .fillMaxWidth()
+                    .height(2.dp)
+            )
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(20.dp)
+            )
+            AdjustText(
+                statsViewModel.currentData,
+                textStyleBody1 = Typography.h3,
+                color = Color.White
+            )
+            if (statsViewModel.gworth!! >= 0f) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Triangle(radius = 50)
+                    AdjustText(
+                        text = "+$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
+                        color = Color.Green,
+                        textStyleBody1 = Typography.h6
+                    )
+                }
+            } else {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Triangle(radius = 50)
+                    AdjustText(
+                        text = "-$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
+                        color = Color.Red,
+                        textStyleBody1 = Typography.h6
+                    )
                 }
             }
-            else{
-                statsViewModel.name.value?.let {
-                    statsViewModel.name1.value?.let { it1 ->
-                        Graphhai(
-                            list = it,
-                            list2 = it1
-                        )
-                    }
-                }
-            }
-        }
+            segmentedButton(list = list, state = state, onStateChange = { state = it })
 
-        Details(CompanyDetails)
-        Spacer(Modifier.size(15.dp))
-        Card(
-            Modifier
-                .padding(5.dp)
-                .height(700.dp),
-            backgroundColor = CardColor,
-            shape = MaterialTheme.shapes.large
-        ) {
-            Column(modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
-                .padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Column(Modifier) {
-                    AdjustText("Share Holding Pattern", textStyleBody1 = MaterialTheme.typography.h1, color = White)
-                    Spacer(modifier = Modifier.size(20.dp))
-                    Progressed(radius = 260, strokeWidth = 30.dp, ShareHoldinglist, colorList)
+            val list3: MutableList<String> by rememberSaveable {
+                mutableStateOf(mutableListOf())
+            }
+
+            when ((statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].meta.range) {
+                "1d" -> {
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
+                        val d = Date(i.toLong())
+                        list3.add("${(d.hours)}:${(d.minutes)}")
+                    }
                 }
-                Spacer(modifier = Modifier.size(50.dp))
-                Card(
-                    Modifier
-                        .padding(5.dp),
-                    backgroundColor = ElementColor,
-                    shape = MaterialTheme.shapes.medium
+
+                "5d" -> {
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
+                        val d = Date(i.toLong())
+                        list3.add(
+                            when (d.day) {
+                                0 -> "Mon"
+                                1 -> "Tue"
+                                2 -> "Wed"
+                                3 -> "Thu"
+                                else -> "Fri"
+                            }
+                        )
+                    }
+                }
+
+                "1mo" -> for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
+                    val d = Date(i.toLong())
+                    list3.add((d.date).toString())
+                }
+
+                "1y" -> {
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
+                        val d = Date(i.toLong())
+                        list3.add(
+                            when (d.day) {
+                                0 -> "Jan"
+                                1 -> "Feb"
+                                2 -> "Mar"
+                                3 -> "Apr"
+                                4 -> "May"
+                                5 -> "Jun"
+                                6 -> "Jul"
+                                7 -> "Aug"
+                                8 -> "Sep"
+                                9 -> "Oct"
+                                10 -> "Nov"
+                                else -> "Dec"
+                            }
+                        )
+                    }
+                }
+
+                "5y" -> for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
+                    val d = Date(i.toLong())
+                    list3.add((d.year).toString())
+                }
+            }
+            val CompanyDetails =
+                listOf<Float>(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f, 13f, 14f, 15f, 16f)
+            Spacer(modifier = Modifier.size(15.dp))
+            val switchState = remember {
+                mutableStateOf(false)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    tint = White,
+                    imageVector = Icons.Filled.DataExploration,
+                    contentDescription = null
+                )
+                Switch(
+                    checked = switchState.value,
+                    onCheckedChange = { switchState.value = it },
+                    modifier = Modifier.size(50.dp),
+                    colors = SwitchDefaults.colors(uncheckedThumbColor = White)
+
+                )
+            }
+            var list2: List<Float> by rememberSaveable {
+                mutableStateOf(listOf())
+            }
+            list2= (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open
+            Card(
+                Modifier
+                    .padding(5.dp),
+                backgroundColor = CardColor,
+                shape = MaterialTheme.shapes.large
+            ) {
+                if (switchState.value) {
+                            Graph1hai(
+                                list = list2,
+                                list2 = list3
+                            )
+                } else {
+                    Graphhai(
+                        list = (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open,
+                        list2 = list3
+                    )
+                }
+            }
+
+            Details(CompanyDetails)
+            Spacer(Modifier.size(15.dp))
+            Card(
+                Modifier
+                    .padding(5.dp)
+                    .height(700.dp),
+                backgroundColor = CardColor,
+                shape = MaterialTheme.shapes.large
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                        .padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LazyColumn {
-                        items(count = 10) {
-                            when ((it%4)) {
-                                0 -> {
-                                    Sharelement(name = CompanyName[(it%4)], Pic = R.drawable.m,colorList[(it%4)])
+                    Column(Modifier) {
+                        AdjustText(
+                            "Share Holding Pattern",
+                            textStyleBody1 = MaterialTheme.typography.h1,
+                            color = White
+                        )
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Progressed(radius = 260, strokeWidth = 30.dp, shareHoldinglist, colorList)
+                    }
+                    Spacer(modifier = Modifier.size(50.dp))
+                    Card(
+                        Modifier
+                            .padding(5.dp),
+                        backgroundColor = ElementColor,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        LazyColumn {
+                            items(count = 10) {
+                                when ((it % 4)) {
+                                    0 -> {
+                                        Sharelement(
+                                            name = companyName[(it % 4)],
+                                            Pic = R.drawable.m,
+                                            colorList[(it % 4)]
+                                        )
+                                    }
+
+                                    1 -> {
+                                        Sharelement(
+                                            name = companyName[(it % 4)],
+                                            Pic = R.drawable.b,
+                                            colorList[(it % 4)]
+                                        )
+                                    }
+
+                                    2 -> {
+                                        Sharelement(
+                                            name = companyName[(it % 4)],
+                                            Pic = R.drawable.c,
+                                            colorList[(it % 4)]
+                                        )
+                                    }
+
+                                    else -> {
+                                        Sharelement(
+                                            name = companyName[(it % 4)],
+                                            Pic = R.drawable.a,
+                                            colorList[(it % 4)]
+                                        )
+                                    }
                                 }
-                                1 -> {
-                                    Sharelement(name = CompanyName[(it%4)], Pic = R.drawable.b,colorList[(it%4)])
-                                }
-                                2 -> {
-                                    Sharelement(name = CompanyName[(it%4)], Pic = R.drawable.c,colorList[(it%4)])
-                                }
-                                else -> {
-                                    Sharelement(name = CompanyName[(it%4)], Pic = R.drawable.a,colorList[(it%4)])
+                            }
+                        }
+                    }
+                }
+            }
+            Card(
+                Modifier
+                    .height(700.dp)
+                    .padding(25.dp),
+                backgroundColor = ElementColor,
+                shape = MaterialTheme.shapes.medium
+            ) {
+                LazyColumn {
+                    items(count = 10) {
+                        when ((it % 4)) {
+                            0 -> {
+                                element(
+                                    name = companyName1[(it % 4)],
+                                    Pic = R.drawable.m,
+                                    colorList[(it % 4)]
+                                )
+                            }
+
+                            1 -> {
+                                element(
+                                    name = companyName1[(it % 4)],
+                                    Pic = R.drawable.b,
+                                    colorList[(it % 4)]
+                                )
+                            }
+
+                            2 -> {
+                                element(
+                                    name = companyName1[(it % 4)],
+                                    Pic = R.drawable.c,
+                                    colorList[(it % 4)]
+                                )
+                            }
+
+                            else -> {
+                                element(
+                                    name = companyName1[(it % 4)],
+                                    Pic = R.drawable.a,
+                                    colorList[(it % 4)]
+                                )
                                 }
                             }
                         }
@@ -242,32 +338,8 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                 }
             }
         }
-        Card(
-            Modifier
-                .height(700.dp)
-                .padding(25.dp),
-            backgroundColor = ElementColor,
-            shape = MaterialTheme.shapes.medium
-        ) {
-            LazyColumn {
-                items(count = 10) {
-                    when ((it%4)) {
-                        0 -> {
-                            element(name = CompanyName1[(it%4)], Pic = R.drawable.m,colorList[(it%4)])
-                        }
-                        1 -> {
-                            element(name = CompanyName1[(it%4)], Pic = R.drawable.b,colorList[(it%4)])
-                        }
-                        2 -> {
-                            element(name = CompanyName1[(it%4)], Pic = R.drawable.c,colorList[(it%4)])
-                        }
-                        else -> {
-                            element(name = CompanyName1[(it%4)], Pic = R.drawable.a,colorList[(it%4)])
-                        }
-                    }
-                }
-            }
-        }
+        is StockUiState1.Loading-> LoadingScreen()
+        else -> ErrorScreen()
     }
 }
 
@@ -364,7 +436,18 @@ fun AdjustText(text:String, color:Color= Black, textStyleBody1: androidx.compose
 @SuppressLint("RememberReturnType")
 @Composable
 fun Graphhai(list: List<Float>,list2:List<String>){
-    val list1=listOf("$0","$50","$100","$150","$200","$250")
+    val list1=when {
+        list.isEmpty() -> listOf("0", "50", "100", "150", "250")
+        else -> listOf(
+            "$0",
+            "${(list.max() / 5).toInt()}",
+            "${2 * (list.max() / 5).toInt()}",
+            "${3 * (list.max() / 5).toInt()}",
+            "${4 * (list.max() / 5).toInt()}",
+            "${(list.max()).toInt()}",
+
+        )
+    }
     var canvasHeight=0f
     var canvasWidth=0f
     var columnWidth=0f
@@ -409,12 +492,12 @@ fun Graphhai(list: List<Float>,list2:List<String>){
                                 cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
                                 topLeft = Offset(
                                     x = space,
-                                    y = (canvasHeight - ((canvasHeight / 250f) * list[i]))
+                                    y = (canvasHeight - ((canvasHeight / list.max()) * list[i]))
                                 ),
                                 color = Teal200,
                                 size = Size(
                                     width = (max(1f, ((canvasWidth / list.size) - 60f))),
-                                    height = ((canvasHeight / 250f) * list[i])
+                                    height = ((canvasHeight / list.max()) * list[i])
                                 )
                             )
                             val rect = Rect(Offset(
@@ -492,10 +575,10 @@ fun Graphhai(list: List<Float>,list2:List<String>){
 }
 @Composable
 fun Graph1hai(list: List<Float>,list2:List<String>) {
-    val list1 = listOf("$250", "$200", "$150", "$100", "$50", "$0")
     var canvasHeight = 0f
     var canvasWidth = 0f
     var columnWidth = 0f
+    val list1 = listOf("${(list.max()).toInt()}", "${4*(list.max()/5).toInt()}", "${3*(list.max()/5).toInt()}", "${2*(list.max()/5).toInt()}", "${(list.max()/5).toInt()}", "$0")
     Column() {
         Row(Modifier.padding(15.dp)) {
 //            Column(
@@ -509,13 +592,11 @@ fun Graph1hai(list: List<Float>,list2:List<String>) {
             Spacer(modifier = Modifier.size(10.dp))
             Column() {
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    val animationProgress = remember {
-                        Animatable(0f)
-                    }
 
-                    LaunchedEffect(key1 = list, block = {
-                        animationProgress.animateTo(1f, tween(3000))
-                    })
+
+//                    LaunchedEffect(key1 = list, block = {
+//                        animationProgress.animateTo(1f, tween(3000))
+//                    })
                     Canvas(
                         modifier = Modifier
                             .height(350.dp)
@@ -529,7 +610,7 @@ fun Graph1hai(list: List<Float>,list2:List<String>) {
                         var previousBalanceY = canvasHeight
                         val max = list.maxBy { it }
                         val range = max
-                        val heightPxPerAmount = canvasHeight / 250f
+                        val heightPxPerAmount = canvasHeight /list.max()
                         drawLine(
                             start = Offset(x = 0f, y = 0f),
                             end = Offset(x = 0f, y = canvasHeight),
@@ -605,7 +686,7 @@ fun Graph1hai(list: List<Float>,list2:List<String>) {
                         FilledPath.relativeLineTo(0f, canvasHeight)
                         FilledPath.lineTo(canvasWidth, canvasHeight)
                         FilledPath.close()
-                        clipRect(right = canvasWidth * animationProgress.value) {
+                        clipRect(right = canvasWidth) {
                             drawPath(path, Color.Green, style = Stroke(2.dp.toPx()))
 
                             drawPath(

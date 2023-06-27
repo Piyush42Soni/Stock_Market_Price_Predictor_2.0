@@ -1,6 +1,7 @@
 package com.example.stockmarketpricepredictor20
 
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,33 +9,36 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockmarketpricepredictor20.data.CurrentData
+import com.example.stockmarketpricepredictor20.data.HistoricalData
 import com.example.stockmarketpricepredictor20.network.StockApi
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-
-/**
- * UI state for the Home screen
- */
-sealed interface StockUiState {
-    data class Success(val photos: String) : StockUiState
-    object Error : StockUiState
-    object Loading : StockUiState
+sealed interface StockUiState1 {
+    data class Success(val photos: HistoricalData) : StockUiState1
+    object Error : StockUiState1
+    object Loading : StockUiState1
 }
-
-class HomeViewModel : ViewModel() {
-    /** The mutable State that stores the status of the most recent request */
-    var stockUiState: StockUiState by mutableStateOf(StockUiState.Loading)
+class StatsViewModel : ViewModel() {
+    var currentData:String  by mutableStateOf("")
+    var companyName:String  by mutableStateOf("ADANIENT.NS")
+    var gworth:Float by mutableStateOf(0f)
+    var stockUiState: StockUiState1 by mutableStateOf(StockUiState1.Loading)
         private set
     private var stockSymbol=MutableLiveData<String>()
-    var statement: MutableList<CurrentData> by mutableStateOf(mutableListOf())
+//    var statement: HistoricalData by mutableStateOf(HistoricalData())
 
     /**
      * Call getStockPhotos() on init so we can display status immediately.
      */
-//    init {
-//        getStockPhotos()
-//    }
+    init {
+        if(companyName.isBlank()){
+            getSymbol("ADANIENT.NS")
+        }
+        else {
+            getSymbol(companyName)
+        }
+    }
 
     /**
      * Gets Stock photos information from the Stock API Retrofit service and updates the
@@ -42,30 +46,26 @@ class HomeViewModel : ViewModel() {
      */
     fun getStockPhotos() {
         viewModelScope.launch {
-            stockUiState = StockUiState.Loading
+            stockUiState = StockUiState1.Loading
             stockUiState = try {
                 val listResult = stockSymbol.value.let {
                     if (it != null) {
-                        StockApi.retrofitService.getCurrentData(it)
+                        StockApi.retrofitService1.getHistoricalData(s=it)
                     } else {
-                        StockApi.retrofitService.getCurrentData("ADANIENT.NS")
+                        StockApi.retrofitService1.getHistoricalData(s="ADANIENT.NS")
                     }
                 }
-                statement.add(listResult)
-                //Log.d("YOHO",statement.last().quoteSummary.result[0].financialData.financialCurrency.toString())
-                StockUiState.Success(
-                    //statement.value.toString()
-                ""
-                )
+                Log.d("YOHO", listResult.chart.result.size.toString())
+                StockUiState1.Success(listResult)
             } catch (e: IOException) {
-                StockUiState.Error
+                StockUiState1.Error
             } catch (e: HttpException) {
-                StockUiState.Error
+                StockUiState1.Error
             }
         }
     }
     fun getSymbol(s:String){
-        stockSymbol.value = s
+        companyName = s
         getStockPhotos()
     }
 }

@@ -1,16 +1,19 @@
 package com.example.stockmarketpricepredictor20.network
 
 import com.example.stockmarketpricepredictor20.data.CurrentData
+import com.example.stockmarketpricepredictor20.data.HistoricalData
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
-private const val BASE_URL =
+private const val BASE_URL1 =
     "https://query1.finance.yahoo.com/v10/finance/quoteSummary/"
-
+private const val BASE_URL2 =
+    "https://query1.finance.yahoo.com/v8/finance/chart/"
 
 
 /**
@@ -18,7 +21,11 @@ private const val BASE_URL =
  */
 private val retrofit = Retrofit.Builder()
     .addConverterFactory(Json{ignoreUnknownKeys = true}.asConverterFactory("application/json".toMediaType()))
-    .baseUrl(BASE_URL)
+    .baseUrl(BASE_URL1)
+    .build()
+private val retrofit1 = Retrofit.Builder()
+    .addConverterFactory(Json{ignoreUnknownKeys = true}.asConverterFactory("application/json".toMediaType()))
+    .baseUrl(BASE_URL2)
     .build()
 
 /**
@@ -26,7 +33,10 @@ private val retrofit = Retrofit.Builder()
  */
 interface StockApiService {
     @GET("{symbol}?modules=financialData")
-    suspend fun getData(@Path("symbol") s:String): CurrentData
+    suspend fun getCurrentData(@Path("symbol") s:String): CurrentData
+
+    @GET("{symbol}?metrics=high?&interval=90m&range=5d")
+    suspend fun getHistoricalData(@Path("symbol") s:String): HistoricalData
 }
 
 /**
@@ -35,6 +45,9 @@ interface StockApiService {
 object StockApi {
     val retrofitService: StockApiService by lazy {
         retrofit.create(StockApiService::class.java)
+    }
+    val retrofitService1: StockApiService by lazy {
+        retrofit1.create(StockApiService::class.java)
     }
 }
 

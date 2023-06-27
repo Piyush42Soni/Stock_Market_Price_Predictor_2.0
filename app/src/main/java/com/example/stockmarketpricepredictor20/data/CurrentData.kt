@@ -7,33 +7,32 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CurrentData(
     @SerialName(value="quoteSummary")
-    val quoteSummary:QuoteSummary?=null,
-    var companyName:String=""
+    val quoteSummary:QuoteSummary= QuoteSummary()
 )
 @Serializable
 data class QuoteSummary(
     @SerialName(value="result")
-    val result:List<FinancialData>
+    val result:List<FinancialData> = listOf()
 )
 @Serializable
 data class FinancialData(
     @SerialName(value="financialData")
-    val financialData:StockResult
+    val financialData:StockResult= StockResult()
 )
 @Serializable
 data class StockResult(
     @SerialName(value="currentPrice")
-    val currentPrice:RawFmt,
+    val currentPrice:RawFmt= RawFmt(),
     @SerialName(value="totalCash")
-    val totalCash:RawFmt,
+    val totalCash:RawFmt=RawFmt(),
     @SerialName(value="ebitda")
-    val ebitda:RawFmt,
+    val ebitda:RawFmt=RawFmt(),
     @SerialName(value="totalRevenue")
-    val totalRevenue:RawFmt,
-    @SerialName(value="financialCurrency")
-    val financialCurrency:String?=null,
+    val totalRevenue:RawFmt=RawFmt(),
     @SerialName(value="earningsGrowth")
-    val earningsGrowth:RawFmt
+    val earningsGrowth:RawFmt=RawFmt(),
+    @SerialName(value="financialCurrency")
+    val financialCurrency:String=""
 )
 @Serializable
 data class RawFmt(
