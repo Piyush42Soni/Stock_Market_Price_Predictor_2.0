@@ -37,11 +37,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.stockmarketpricepredictor20.data.CurrentData
 import com.example.stockmarketpricepredictor20.ui.theme.*
 import java.lang.Float.max
 import java.util.*
 
 class StatsViewModel:ViewModel(){
+    var currentData:CurrentData  by mutableStateOf(CurrentData())
     private val _name=MutableLiveData<List<Float>>()
     val name=_name
     private val _name1=MutableLiveData<List<String>>()
@@ -70,7 +72,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
         .fillMaxSize()
         .padding(15.dp)
         .verticalScroll(rememberScrollState())) {
-        AdjustText("Company Name",textStyleBody1= Typography.h4, color = HeadingColor)
+        AdjustText(statsViewModel.currentData.companyName,textStyleBody1= Typography.h4, color = HeadingColor)
         Spacer(
             Modifier
                 .fillMaxWidth()
@@ -85,14 +87,29 @@ fun StatsPage(statsViewModel: StatsViewModel) {
             Modifier
                 .fillMaxWidth()
                 .height(20.dp))
-        AdjustText("2000.0",textStyleBody1= Typography.h3, color = Color.White)
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Triangle(radius = 50)
-            AdjustText(text = "+44.5(1.75%)",color= Color.Green, textStyleBody1 = Typography.h6)
+        AdjustText(statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.currentPrice?.raw.toString(),textStyleBody1= Typography.h3, color = Color.White)
+        if(statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw!! >=0f) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Triangle(radius = 50)
+                AdjustText(
+                    text = "+$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
+                    color = Color.Green,
+                    textStyleBody1 = Typography.h6
+                )
+            }
         }
-
+        else{
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Triangle(radius = 50)
+                AdjustText(
+                    text = "-$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
+                    color = Color.Red,
+                    textStyleBody1 = Typography.h6
+                )
+            }
+        }
         segmentedButton(list = list, state =state , onStateChange = {state=it})
-        var list3:List<String> =when(state){
+        val list3:List<String> =when(state){
             0-> listOf("9:00","11:00","13:00","15:00","17:00")
             1->listOf("Mon","Tue","Wed","Thu","Fri")
             2->listOf("1","2","3","4","5","6","7","8","9","10",
@@ -102,7 +119,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
             else->listOf("2018","2019","2020","2021","2022")
         }
         val CompanyDetails=listOf<Float>(1f,2f,3f,4f,5f,6f,7f,8f,9f,10f,11f,12f,13f,14f,15f,16f)
-        var list2:MutableList<Float> = mutableListOf<Float>()
+        val list2:MutableList<Float> = mutableListOf<Float>()
         when(state){
             0->{
                 for(i in 1..5){

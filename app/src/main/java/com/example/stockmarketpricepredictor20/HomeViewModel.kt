@@ -1,6 +1,7 @@
 package com.example.stockmarketpricepredictor20
 
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +10,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.stockmarketpricepredictor20.data.CurrentData
 import com.example.stockmarketpricepredictor20.network.StockApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -27,14 +30,15 @@ class HomeViewModel : ViewModel() {
     /** The mutable State that stores the status of the most recent request */
     var stockUiState: StockUiState by mutableStateOf(StockUiState.Loading)
         private set
-    var stockSymbol="ADANIENT.NS"
+    private var stockSymbol=MutableLiveData<String>()
+    var statement: MutableList<CurrentData> by mutableStateOf(mutableListOf())
 
     /**
      * Call getStockPhotos() on init so we can display status immediately.
      */
-    init {
-        getStockPhotos()
-    }
+//    init {
+//        getStockPhotos()
+//    }
 
     /**
      * Gets Stock photos information from the Stock API Retrofit service and updates the
@@ -44,10 +48,18 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             stockUiState = StockUiState.Loading
             stockUiState = try {
-                val listResult = stockSymbol.let { StockApi.retrofitService.getData(it) }
-                val s1 by mutableStateOf("Success: ${listResult.quoteSummary.result.get(0).financialData.currentPrice} Stock photos retrieved")
+                val listResult = stockSymbol.value.let {
+                    if (it != null) {
+                        StockApi.retrofitService.getData(it)
+                    } else {
+                        StockApi.retrofitService.getData("ADANIENT.NS")
+                    }
+                }
+                statement.add(listResult)
+                //Log.d("YOHO",statement.last().quoteSummary.result[0].financialData.financialCurrency.toString())
                 StockUiState.Success(
-                    s1
+                    //statement.value.toString()
+                ""
                 )
             } catch (e: IOException) {
                 StockUiState.Error
@@ -55,5 +67,9 @@ class HomeViewModel : ViewModel() {
                 StockUiState.Error
             }
         }
+    }
+    fun getSymbol(s:String){
+        stockSymbol.value = s
+        getStockPhotos()
     }
 }

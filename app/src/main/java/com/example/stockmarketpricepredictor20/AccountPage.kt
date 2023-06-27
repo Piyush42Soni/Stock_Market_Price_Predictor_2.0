@@ -243,7 +243,7 @@ fun Progressed(radius:Int,strokeWidth: Dp,list:MutableList<Float>,listColor:List
 fun PreviewedHai() {
     StockMarketPricePredictor20Theme {
         val homeViewModel: HomeViewModel = viewModel()
-        HomePage(StockUiState = homeViewModel.stockUiState)
+        //HomePage(homeViewModel,{})
         //element(name = "RAJU", Pic = R.drawable.m)
     }
 }

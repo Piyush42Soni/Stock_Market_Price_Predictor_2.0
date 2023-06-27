@@ -89,9 +89,9 @@ fun LoginPage(onSendButtonClicked : () -> Unit) {
                 .fillMaxWidth()
                 .padding(horizontal=55.dp),
             onClick = {
-                if(username=="YOHO" && password=="YOHO") {
+//                if(username=="YOHO" && password=="YOHO") {
                     onSendButtonClicked()
-                }
+//                }
             }
             , shape = MaterialTheme.shapes.small
         ) {

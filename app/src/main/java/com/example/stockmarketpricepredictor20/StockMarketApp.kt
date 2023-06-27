@@ -177,6 +177,7 @@ fun StockMarketApp(
     val topBarState = rememberSaveable { (mutableStateOf(false)) }
     val currentActive=rememberSaveable { (mutableStateOf(0)) }
     val backStackEntry by navController.currentBackStackEntryAsState()
+    val statsViewModel: StatsViewModel = viewModel()
     val currentScreen = StockScreen.valueOf(
         backStackEntry?.destination?.route ?: StockScreen.Login.name
     )
@@ -216,7 +217,10 @@ fun StockMarketApp(
             ) {
                 composable(route = StockScreen.Home.name) {
                     val homeViewModel: HomeViewModel = viewModel()
-                    HomePage(StockUiState = homeViewModel.stockUiState)
+                    HomePage(homeViewModel, onPageChange = {
+                        statsViewModel.currentData=it
+                        navController.navigate(StockScreen.Stats.name)
+                    })
                     bottomBarState.value=true
                     topBarState.value=true
                     currentActive.value=1
@@ -235,7 +239,6 @@ fun StockMarketApp(
                     currentActive.value=0
                 }
                 composable(route = StockScreen.Stats.name) {
-                    val statsViewModel: StatsViewModel = viewModel()
                     StatsPage(statsViewModel)
                     bottomBarState.value=true
                     topBarState.value=true

@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CurrentData(
     @SerialName(value="quoteSummary")
-    val quoteSummary:QuoteSummary
+    val quoteSummary:QuoteSummary?=null,
+    var companyName:String=""
 )
 @Serializable
 data class QuoteSummary(
@@ -30,12 +31,14 @@ data class StockResult(
     @SerialName(value="totalRevenue")
     val totalRevenue:RawFmt,
     @SerialName(value="financialCurrency")
-    val financialCurrency:String
+    val financialCurrency:String?=null,
+    @SerialName(value="earningsGrowth")
+    val earningsGrowth:RawFmt
 )
 @Serializable
 data class RawFmt(
     @SerialName(value="raw")
-    val raw:Float
+    val raw:Float=0f
 )
 
 //"financialData":{
