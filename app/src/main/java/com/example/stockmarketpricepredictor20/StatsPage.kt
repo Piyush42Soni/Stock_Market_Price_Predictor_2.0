@@ -4,6 +4,7 @@ package com.example.stockmarketpricepredictor20
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.graphics.PointF
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -38,14 +39,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stockmarketpricepredictor20.ui.theme.*
 import java.lang.Float.max
+import java.text.SimpleDateFormat
 import java.util.*
 
 
 @Composable
 fun StatsPage(statsViewModel: StatsViewModel) {
-    LaunchedEffect(Unit){
-        statsViewModel.getSymbol(statsViewModel.companyName)
-    }
     when (statsViewModel.stockUiState) {
     is StockUiState1.Success-> {
         val shareHoldinglist = remember {
@@ -97,7 +96,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Triangle(radius = 50)
                     AdjustText(
-                        text = "+$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
+                        text = "+${statsViewModel.gworth}",
                         color = Color.Green,
                         textStyleBody1 = Typography.h6
                     )
@@ -120,9 +119,10 @@ fun StatsPage(statsViewModel: StatsViewModel) {
 
             when ((statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].meta.range) {
                 "1d" -> {
+                    lateinit var d:Date
                     for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
-                        val d = Date(i.toLong())
-                        list3.add("${(d.hours)}:${(d.minutes)}")
+                        d=Date((i*1000))
+                        list3.add("${d.hours}:${d.minutes}")
                     }
                 }
 
@@ -197,25 +197,28 @@ fun StatsPage(statsViewModel: StatsViewModel) {
 
                 )
             }
-            var list2: List<Float> by rememberSaveable {
-                mutableStateOf(listOf())
-            }
-            list2= (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open
+            val list2= (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open.reversed()
             Card(
                 Modifier
                     .padding(5.dp),
                 backgroundColor = CardColor,
                 shape = MaterialTheme.shapes.large
             ) {
+                val c=(statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float>
+                c.replaceAll { it-list2.min() }
                 if (switchState.value) {
                             Graph1hai(
-                                list = list2,
-                                list2 = list3
+                                list = c,
+                                list2 = list3,
+                                Min=list2.min().toInt(),
+                                Max=list2.max().toInt()
                             )
                 } else {
                     Graphhai(
-                        list = (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open,
-                        list2 = list3
+                        list = c,
+                        list2 = list3,
+                        Min=list2.min().toInt(),
+                        Max=list2.max().toInt()
                     )
                 }
             }
@@ -435,19 +438,20 @@ fun AdjustText(text:String, color:Color= Black, textStyleBody1: androidx.compose
 }
 @SuppressLint("RememberReturnType")
 @Composable
-fun Graphhai(list: List<Float>,list2:List<String>){
+fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
     val list1=when {
         list.isEmpty() -> listOf("0", "50", "100", "150", "250")
         else -> listOf(
-            "$0",
-            "${(list.max() / 5).toInt()}",
-            "${2 * (list.max() / 5).toInt()}",
-            "${3 * (list.max() / 5).toInt()}",
-            "${4 * (list.max() / 5).toInt()}",
-            "${(list.max()).toInt()}",
+            "${(Min).toInt()}",
+            "${(Min+((Max-Min) / 5)).toInt()}",
+            "${(Min+(2*(Max-Min) / 5)).toInt()}",
+            "${(Min+(3*(Max-Min) / 5)).toInt()}",
+            "${(Min+(4*(Max-Min) / 5)).toInt()}",
+            "${(Max).toInt()}",
 
         )
     }
+    
     var canvasHeight=0f
     var canvasWidth=0f
     var columnWidth=0f
@@ -492,12 +496,12 @@ fun Graphhai(list: List<Float>,list2:List<String>){
                                 cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
                                 topLeft = Offset(
                                     x = space,
-                                    y = (canvasHeight - ((canvasHeight / list.max()) * list[i]))
+                                    y = (canvasHeight - ((canvasHeight / (list.max())) * list[i]))
                                 ),
                                 color = Teal200,
                                 size = Size(
                                     width = (max(1f, ((canvasWidth / list.size) - 60f))),
-                                    height = ((canvasHeight / list.max()) * list[i])
+                                    height = ((canvasHeight / (list.max())) * list[i])
                                 )
                             )
                             val rect = Rect(Offset(
@@ -574,11 +578,22 @@ fun Graphhai(list: List<Float>,list2:List<String>){
     }
 }
 @Composable
-fun Graph1hai(list: List<Float>,list2:List<String>) {
+fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
     var canvasHeight = 0f
     var canvasWidth = 0f
     var columnWidth = 0f
-    val list1 = listOf("${(list.max()).toInt()}", "${4*(list.max()/5).toInt()}", "${3*(list.max()/5).toInt()}", "${2*(list.max()/5).toInt()}", "${(list.max()/5).toInt()}", "$0")
+    val list1=when {
+        list.isEmpty() -> listOf("0", "50", "100", "150", "250")
+        else -> listOf(
+            "${(Min).toInt()}",
+            "${(Min+((Max-Min) / 5)).toInt()}",
+            "${(Min+(2*(Max-Min) / 5)).toInt()}",
+            "${(Min+(3*(Max-Min) / 5)).toInt()}",
+            "${(Min+(4*(Max-Min) / 5)).toInt()}",
+            "${(Max).toInt()}",
+
+            )
+    }
     Column() {
         Row(Modifier.padding(15.dp)) {
 //            Column(
@@ -849,3 +864,8 @@ fun PreviewedHaiTharhega() {
         StatsPage(statsViewModel)
     }
 }
+
+
+
+
+

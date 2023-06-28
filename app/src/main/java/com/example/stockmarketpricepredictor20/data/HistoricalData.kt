@@ -20,7 +20,7 @@ data class HistoricalResult(
     @SerialName("indicators")
     val indicators:Indicators,
     @SerialName("timestamp")
-    val timestamp:List<Int>
+    val timestamp:List<Long>
 )
 @Serializable
 data class Indicators(

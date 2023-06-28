@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -221,6 +222,7 @@ fun StockMarketApp(
                         statsViewModel.currentData=it
                         statsViewModel.companyName=it1
                         statsViewModel.gworth=it2
+                        statsViewModel.getSymbol(statsViewModel.companyName)
                         navController.navigate(StockScreen.Stats.name)
                     })
                     bottomBarState.value=true

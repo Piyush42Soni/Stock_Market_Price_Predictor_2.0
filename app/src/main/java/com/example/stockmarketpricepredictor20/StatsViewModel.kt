@@ -48,12 +48,8 @@ class StatsViewModel : ViewModel() {
         viewModelScope.launch {
             stockUiState = StockUiState1.Loading
             stockUiState = try {
-                val listResult = stockSymbol.value.let {
-                    if (it != null) {
-                        StockApi.retrofitService1.getHistoricalData(s=it)
-                    } else {
-                        StockApi.retrofitService1.getHistoricalData(s="ADANIENT.NS")
-                    }
+                val listResult = companyName.let {
+                    StockApi.retrofitService1.getHistoricalData(s=it)
                 }
                 Log.d("YOHO", listResult.chart.result.size.toString())
                 StockUiState1.Success(listResult)

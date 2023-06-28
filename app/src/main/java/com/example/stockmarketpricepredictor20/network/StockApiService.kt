@@ -35,7 +35,7 @@ interface StockApiService {
     @GET("{symbol}?modules=financialData")
     suspend fun getCurrentData(@Path("symbol") s:String): CurrentData
 
-    @GET("{symbol}?metrics=high?&interval=90m&range=5d")
+    @GET("{symbol}?metrics=high?&interval=15m&range=1d")
     suspend fun getHistoricalData(@Path("symbol") s:String): HistoricalData
 }
 
