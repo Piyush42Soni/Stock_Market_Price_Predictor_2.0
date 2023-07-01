@@ -49,9 +49,9 @@ fun HomePage(
         mutableStateOf(mutableListOf<CurrentData>())
     }
         for (it in SymbolList.indices) {
-            LaunchedEffect(SymbolList[it]) {
-                homeViewModel.getSymbol(SymbolList[it])
-            }
+//            LaunchedEffect(SymbolList[it]) {
+//                homeViewModel.getSymbol(SymbolList[it])
+//            }
             when (homeViewModel.stockUiState) {
                 is StockUiState.Loading -> b1 = 1
                 is StockUiState.Error -> {

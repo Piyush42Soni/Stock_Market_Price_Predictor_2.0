@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockmarketpricepredictor20.data.CurrentData
 import com.example.stockmarketpricepredictor20.data.HistoricalData
+import com.example.stockmarketpricepredictor20.data.ShareHoldingPatternData
 import com.example.stockmarketpricepredictor20.network.StockApi
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -23,27 +24,21 @@ class StatsViewModel : ViewModel() {
     var currentData:String  by mutableStateOf("")
     var companyName:String  by mutableStateOf("ADANIENT.NS")
     var gworth:Float by mutableStateOf(0f)
+    var shareHoldingPatternData:ShareHoldingPatternData by mutableStateOf(ShareHoldingPatternData())
     var stockUiState: StockUiState1 by mutableStateOf(StockUiState1.Loading)
         private set
     private var stockSymbol=MutableLiveData<String>()
 //    var statement: HistoricalData by mutableStateOf(HistoricalData())
 
-    /**
-     * Call getStockPhotos() on init so we can display status immediately.
-     */
     init {
         if(companyName.isBlank()){
             getSymbol("ADANIENT.NS")
         }
         else {
             getSymbol(companyName)
+            getStockShareHoldingPatternData()
         }
     }
-
-    /**
-     * Gets Stock photos information from the Stock API Retrofit service and updates the
-     * [StockPhoto] [List] [MutableList].
-     */
     fun getStockPhotos() {
         viewModelScope.launch {
             stockUiState = StockUiState1.Loading
@@ -57,6 +52,19 @@ class StatsViewModel : ViewModel() {
                 StockUiState1.Error
             } catch (e: HttpException) {
                 StockUiState1.Error
+            }
+        }
+    }
+    fun getStockShareHoldingPatternData() {
+        viewModelScope.launch {
+            shareHoldingPatternData = try {
+                companyName.let {
+                    StockApi.retrofitService.getShareHoldingPattern(it)
+                }
+            } catch (e: IOException) {
+                ShareHoldingPatternData()
+            } catch (e: HttpException) {
+                ShareHoldingPatternData()
             }
         }
     }

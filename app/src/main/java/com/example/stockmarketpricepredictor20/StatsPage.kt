@@ -48,11 +48,11 @@ fun StatsPage(statsViewModel: StatsViewModel) {
     when (statsViewModel.stockUiState) {
     is StockUiState1.Success-> {
         val shareHoldinglist = remember {
-            mutableStateListOf<Float>(10f, 20f, 120f, 60f)
+            mutableStateListOf<Float>(statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.insidersPercentHeld.raw,statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.institutionsPercentHeld.raw,1-statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.insidersPercentHeld.raw-statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.institutionsPercentHeld.raw)
         }
 
         val list = listOf<String>("1D", "1W", "1M", "1Y", "Max")
-        val companyName = listOf<String>("Promoters", "FII", "DII", "Public")
+        val companyName = listOf<String>("Insiders","Institutions","Others")
         val companyName1 = listOf<String>("C1", "C2", "C3", "C4")
         val colorList = listOf(ProgressColor1, ProgressColor2, ProgressColor3, ProgressColor4)
         var state by remember {
@@ -255,7 +255,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                         shape = MaterialTheme.shapes.medium
                     ) {
                         LazyColumn {
-                            items(count = 10) {
+                            items(count = companyName.size) {
                                 when ((it % 4)) {
                                     0 -> {
                                         Sharelement(
