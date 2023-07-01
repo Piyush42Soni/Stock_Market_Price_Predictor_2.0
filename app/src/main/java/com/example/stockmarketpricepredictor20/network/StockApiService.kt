@@ -43,6 +43,8 @@ interface StockApiService {
     suspend fun getHistoricalDataMonthly(@Path("symbol") s:String): HistoricalData
     @GET("{symbol}?metrics=high?&interval=1mo&range=1y")
     suspend fun getHistoricalDataYearly(@Path("symbol") s:String): HistoricalData
+    @GET("{symbol}?metrics=high?&interval=1d&range=5d")
+    suspend fun getHistoricalDataWeekly(@Path("symbol") s:String): HistoricalData
 }
 
 /**

@@ -35,15 +35,15 @@ data class Meta(
 @Serializable
 data class Quote(
     @SerialName("open")
-    val open:List<Float> ,
+    val open:List<Float?> ,
     @SerialName("close")
-    val close:List<Float> ,
+    val close:List<Float?> ,
     @SerialName("high")
-    val high:List<Float> ,
+    val high:List<Float?> ,
     @SerialName("volume")
-    val volume:List<Int> ,
+    val volume:List<Int?> ,
     @SerialName("low")
-    val low:List<Float>
+    val low:List<Float?>
 )
 //"chart"{
 //    "result":[{

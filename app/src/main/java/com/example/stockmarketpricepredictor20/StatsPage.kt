@@ -39,6 +39,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stockmarketpricepredictor20.ui.theme.*
 import java.lang.Float.max
+import java.lang.Float.min
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,7 +52,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
             mutableStateListOf<Float>(statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.insidersPercentHeld.raw,statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.institutionsPercentHeld.raw,1-statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.insidersPercentHeld.raw-statsViewModel.shareHoldingPatternData.quoteSummary.result[0].majorHoldersBreakdown.institutionsPercentHeld.raw)
         }
 
-        val list = listOf<String>("1D", "1W", "1M", "1Y", "Max")
+        val list = listOf<String>("1D", "1W", "1M", "1Y")
         val companyName = listOf<String>("Insiders","Institutions","Others")
         val companyName1 = listOf<String>("C1", "C2", "C3", "C4")
         val colorList = listOf(ProgressColor1, ProgressColor2, ProgressColor3, ProgressColor4)
@@ -111,24 +112,26 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                     )
                 }
             }
-            segmentedButton(list = list, state = state, onStateChange = { state = it })
+            segmentedButton(list = list, state = state, onStateChange = { state=it })
 
-            val list3: MutableList<String> by rememberSaveable {
+            var list3: MutableList<String> by rememberSaveable {
                 mutableStateOf(mutableListOf())
             }
 
-            when ((statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].meta.range) {
-                "1d" -> {
+            when (statsViewModel.range) {
+                1 -> {
                     lateinit var d:Date
-                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
+                    list3= mutableListOf()
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                         d=Date((i*1000))
                         list3.add("${d.hours}:${d.minutes}")
                     }
                 }
 
-                "5d" -> {
-                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
-                        val d = Date(i.toLong())
+                2 -> {
+                    list3.clear()
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                        val d = Date(i.toLong()*1000)
                         list3.add(
                             when (d.day) {
                                 0 -> "Mon"
@@ -141,14 +144,18 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                     }
                 }
 
-                "1mo" -> for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
-                    val d = Date(i.toLong())
-                    list3.add((d.date).toString())
+                3 -> {
+                    list3= mutableListOf()
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                        val d = Date(i.toLong()*1000)
+                        list3.add((d.date).toString())
+                    }
                 }
 
-                "1y" -> {
-                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
-                        val d = Date(i.toLong())
+                else -> {
+                    list3= mutableListOf()
+                    for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                        val d = Date(i.toLong()*1000)
                         list3.add(
                             when (d.day) {
                                 0 -> "Jan"
@@ -166,11 +173,6 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                             }
                         )
                     }
-                }
-
-                "5y" -> for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].timestamp) {
-                    val d = Date(i.toLong())
-                    list3.add((d.year).toString())
                 }
             }
             val CompanyDetails =
@@ -197,15 +199,22 @@ fun StatsPage(statsViewModel: StatsViewModel) {
 
                 )
             }
-            val list2= (statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open.reversed()
+            val list2= ((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+            list2.replaceAll{it?:statsViewModel.currentData.toFloat()}
+            list2 as List<Float>
+
             Card(
                 Modifier
                     .padding(5.dp),
                 backgroundColor = CardColor,
                 shape = MaterialTheme.shapes.large
             ) {
-                val c=(statsViewModel.stockUiState as StockUiState1.Success).photos.chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float>
+                val c=((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+                c.replaceAll{it?:statsViewModel.currentData.toFloat()}
+                c as MutableList<Float>
                 c.replaceAll { it-list2.min() }
+                c.reverse()
+                list3.reverse()
                 if (switchState.value) {
                             Graph1hai(
                                 list = c,
@@ -355,7 +364,7 @@ fun segmentedButton(list:List<String>,state:Int,onStateChange:(Int)->Unit) {
             if (it == 0) {
                 if (state == it) {
                     Button(
-                        onClick = { onStateChange(it) },
+                        onClick = {},
                         shape = CircleShape,
                         modifier = Modifier.size(50.dp)
                     ) {

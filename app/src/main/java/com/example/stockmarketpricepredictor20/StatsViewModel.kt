@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 sealed interface StockUiState1 {
-    data class Success(val photos: HistoricalData) : StockUiState1
+    data class Success(val photos: List<HistoricalData>) : StockUiState1
     object Error : StockUiState1
     object Loading : StockUiState1
 }
@@ -26,7 +26,7 @@ class StatsViewModel : ViewModel() {
     var gworth:Float by mutableStateOf(0f)
     var shareHoldingPatternData:ShareHoldingPatternData by mutableStateOf(ShareHoldingPatternData())
     var stockUiState: StockUiState1 by mutableStateOf(StockUiState1.Loading)
-        private set
+    var range:Int by mutableStateOf(1)
     private var stockSymbol=MutableLiveData<String>()
 //    var statement: HistoricalData by mutableStateOf(HistoricalData())
 
@@ -44,9 +44,13 @@ class StatsViewModel : ViewModel() {
             stockUiState = StockUiState1.Loading
             stockUiState = try {
                 val listResult = companyName.let {
-                    StockApi.retrofitService1.getHistoricalData(s=it)
+                    listOf(StockApi.retrofitService1.getHistoricalData(s = it)
+                        ,StockApi.retrofitService1.getHistoricalDataWeekly(s = it)
+                        ,StockApi.retrofitService1.getHistoricalDataMonthly(s = it)
+                        ,StockApi.retrofitService1.getHistoricalDataYearly(s = it)
+                    )
                 }
-                Log.d("YOHO", listResult.chart.result.size.toString())
+                Log.d("YOHO", listResult[0].chart.result.size.toString())
                 StockUiState1.Success(listResult)
             } catch (e: IOException) {
                 StockUiState1.Error
