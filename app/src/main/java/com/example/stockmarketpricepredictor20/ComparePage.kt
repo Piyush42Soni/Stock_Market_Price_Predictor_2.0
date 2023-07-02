@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.DataExploration
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -34,209 +35,286 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stockmarketpricepredictor20.ui.theme.*
 import java.lang.Float.max
 import java.util.*
+import kotlin.math.min
 
-class ComparePageViewModel: ViewModel(){
-    private val _name= MutableLiveData<List<Float>>()
-    val name=_name
-    private val _name1= MutableLiveData<List<String>>()
-    val name1=_name1
+@Composable
+fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) {
+    when (statsViewModel.stockUiState) {
+        is StockUiState1.Loading -> LoadingScreen()
+        is StockUiState1.Success -> {
+            when (statsViewModel2.stockUiState) {
+                is StockUiState1.Success -> {
+                    val list = listOf<String>("1D", "1W", "1M", "1Y")
+                    var state by remember {
+                        mutableStateOf(0)
+                    }
 
-    private val _name2= MutableLiveData<List<Float>>()
-    val name2=_name2
-    fun onNameChange(newList: List<Float>){
-        _name.value=newList
-    }
-    fun onName1Change(newList: List<String>){
-        _name1.value=newList
-    }
-    fun onName2Change(newList: List<Float>){
-        _name2.value=newList
+                    var list3
+                            : MutableList<String> by rememberSaveable {
+                        mutableStateOf(mutableListOf())
+                    }
+                    when (state) {
+                        0 -> {
+                            lateinit var d: Date
+                            list3 = mutableListOf()
+                            for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                                d = Date((i * 1000))
+                                list3.add("${d.hours}:${d.minutes}")
+                            }
+                        }
+
+                        1 -> {
+                            list3.clear()
+                            for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                                val d = Date(i.toLong() * 1000)
+                                list3.add(
+                                    when (d.day) {
+                                        0 -> "Mon"
+                                        1 -> "Tue"
+                                        2 -> "Wed"
+                                        3 -> "Thu"
+                                        else -> "Fri"
+                                    }
+                                )
+                            }
+                        }
+
+                        2 -> {
+                            list3 = mutableListOf()
+                            for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                                val d = Date(i.toLong() * 1000)
+                                list3.add((d.date).toString())
+                            }
+                        }
+
+                        else -> {
+                            list3 = mutableListOf()
+                            for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
+                                val d = Date(i.toLong() * 1000)
+                                list3.add(
+                                    when (d.day) {
+                                        0 -> "Jan"
+                                        1 -> "Feb"
+                                        2 -> "Mar"
+                                        3 -> "Apr"
+                                        4 -> "May"
+                                        5 -> "Jun"
+                                        6 -> "Jul"
+                                        7 -> "Aug"
+                                        8 -> "Sep"
+                                        9 -> "Oct"
+                                        10 -> "Nov"
+                                        else -> "Dec"
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    val CompanyDetails =
+                        listOf<Float>(
+                            statsViewModel.indexTrendData.quoteSummary.result[0].indexTrend.peRatio.raw,
+                            statsViewModel.indexTrendData.quoteSummary.result[0].indexTrend.pegRatio.raw
+                        )
+
+                    val CompanyDetails2 =
+                        listOf<Float>(
+                            statsViewModel2.indexTrendData.quoteSummary.result[0].indexTrend.peRatio.raw,
+                            statsViewModel2.indexTrendData.quoteSummary.result[0].indexTrend.pegRatio.raw
+                        )
+
+                    val list2 =
+                        ((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+
+                    list2.replaceAll { it ?: statsViewModel.currentData.toFloat() }
+                    list2 as List<Float>
+                    val list4 =
+                        ((statsViewModel2.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+
+                    list4.replaceAll { it ?: statsViewModel2.currentData.toFloat() }
+                    list4 as List<Float>
+                    val c=((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+                    c.replaceAll{it?:statsViewModel.currentData.toFloat()}
+                    c as MutableList<Float>
+                    c.replaceAll { it-list2.min() }
+                    c.reverse()
+                    list3.reverse()
+
+                    val c1=((statsViewModel2.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+                    c1.replaceAll{it?:statsViewModel2.currentData.toFloat()}
+                    c1 as MutableList<Float>
+                    c1.replaceAll { it-list4.min() }
+                    c1.reverse()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(BackgroundColor)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        segmentedButton(list = list, state = state, onStateChange = { state = it })
+                        Spacer(modifier = Modifier.size(15.dp))
+                        val switchState = remember {
+                            mutableStateOf(false)
+                        }
+                        var mSelectedText by rememberSaveable{ mutableStateOf("ADANIENT.NS") }
+                        Spacer(modifier = Modifier.size(15.dp))
+                        var mSelectedText2 by rememberSaveable{ mutableStateOf("ADANIENT.NS") }
+                        MyContent(label1 = "Company1", mSelectedText) {
+                            mSelectedText = it
+                            statsViewModel.getSymbol(it)
+                        }
+                        MyContent(label1 = "Company2", mSelectedText2) {
+                            mSelectedText2 = it
+                            statsViewModel2.getSymbol(it)
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                tint = Color.White,
+                                imageVector = Icons.Filled.DataExploration,
+                                contentDescription = null
+                            )
+                            Switch(
+                                checked = switchState.value,
+                                onCheckedChange = { switchState.value = it },
+                                modifier = Modifier.size(50.dp),
+                                colors = SwitchDefaults.colors(uncheckedThumbColor = Color.White)
+                            )
+                        }
+                        Card(
+                            Modifier
+                                .padding(5.dp),
+                            backgroundColor = CardColor,
+                            shape = MaterialTheme.shapes.large
+                        ) {
+                            if (switchState.value) {
+                                CompareGraph1hai(c, list3, c1)
+                            } else {
+                                CompareGraphhai(c, list3, c1)
+                            }
+                        }
+                        Spacer(modifier = Modifier.size(15.dp))
+                        Card(
+                            Modifier
+                                .padding(5.dp)
+                                .height(700.dp),
+                            backgroundColor = CardColor,
+                            shape = MaterialTheme.shapes.large
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(400.dp)
+                                    .padding(30.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                val colorList = listOf<Color>(Purple200, Teal200)
+                                val list6 = mutableListOf(100f, 300f)
+                                Column(Modifier) {
+                                    Progressed(radius = 260, strokeWidth = 30.dp, list6, colorList)
+                                }
+                                Spacer(modifier = Modifier.size(50.dp))
+                                Card(
+                                    Modifier
+                                        .padding(5.dp),
+                                    backgroundColor = ElementColor,
+                                    shape = MaterialTheme.shapes.medium
+                                ) {
+                                    LazyColumn {
+                                        item() {
+                                            when ((mSelectedText)) {
+                                                "C1" -> {
+                                                    element(
+                                                        name = mSelectedText,
+                                                        Pic = R.drawable.m,
+                                                        Purple200
+                                                    )
+                                                }
+
+                                                "C2" -> {
+                                                    element(
+                                                        name = mSelectedText,
+                                                        Pic = R.drawable.a,
+                                                        Purple200
+                                                    )
+                                                }
+
+                                                "C3" -> {
+                                                    element(
+                                                        name = mSelectedText,
+                                                        Pic = R.drawable.b,
+                                                        Purple200
+                                                    )
+                                                }
+
+                                                else -> {
+                                                    element(
+                                                        name = mSelectedText,
+                                                        Pic = R.drawable.c,
+                                                        Purple200
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        item() {
+                                            when ((mSelectedText2)) {
+                                                "C1" -> {
+                                                    element(
+                                                        name = mSelectedText2,
+                                                        Pic = R.drawable.m,
+                                                        Teal200
+                                                    )
+                                                }
+
+                                                "C2" -> {
+                                                    element(
+                                                        name = mSelectedText2,
+                                                        Pic = R.drawable.a,
+                                                        Teal200
+                                                    )
+                                                }
+
+                                                "C3" -> {
+                                                    element(
+                                                        name = mSelectedText2,
+                                                        Pic = R.drawable.b,
+                                                        Teal200
+                                                    )
+                                                }
+
+                                                else -> {
+                                                    element(
+                                                        name = mSelectedText2,
+                                                        Pic = R.drawable.c,
+                                                        Teal200
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                is StockUiState1.Loading -> LoadingScreen()
+                else -> ErrorScreen()
+            }
+        }
+        else -> LoadingScreen()
     }
 }
 @Composable
-fun ComparePage(comparePageViewModel: ComparePageViewModel) {
-    val list= listOf<String>("1D","1W","1M","1Y","Max")
-    var state by remember {
-        mutableStateOf(0)
-    }
-    var list3:List<String> =when(state){
-        0-> listOf("9:00","11:00","13:00","15:00","17:00")
-        1->listOf("Mon","Tue","Wed","Thu","Fri")
-        2->listOf("1","2","3","4","5","6","7","8","9","10",
-            "11","12","13","14","15","16","17","18","19","20"
-            ,"21","22","23","24","25","26","27","28","29","30")
-        3->listOf("Jan","Feb","March","April","May","June","July","Aug","Sep","Oct","Nov","Dec")
-        else->listOf("2018","2019","2020","2021","2022")
-    }
-    var list2:MutableList<Float> = mutableListOf<Float>()
-    var list4:MutableList<Float> = mutableListOf<Float>()
-    when(state){
-        0->{
-            for(i in 1..5){
-                val rd = Random() // creating Random object
-                list2.add((rd.nextFloat()*250f))
-                list4.add((rd.nextFloat()*250f))
-            }
-        }
-        1->{
-            for(i in 1..5){
-                val rd = Random() // creating Random object
-                list2.add((rd.nextFloat()*250f))
-                list4.add((rd.nextFloat()*250f))
-            }
-        }
-        2->{
-            for(i in 1..30){
-                val rd = Random() // creating Random object
-                list2.add((rd.nextFloat()*250f))
-                list4.add((rd.nextFloat()*250f))
-            }
-        }
-        3->{
-            for(i in 1..12){
-                val rd = Random() // creating Random object
-                list2.add((rd.nextFloat()*250f))
-                list4.add((rd.nextFloat()*250f))
-            }
-        }
-        else->{
-            for(i in 1..5){
-                val rd = Random() // creating Random object
-                list2.add((rd.nextFloat()*250f))
-                list4.add((rd.nextFloat()*250f))
-            }
-        }
-    }
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(BackgroundColor)
-        .verticalScroll(rememberScrollState())) {
-        segmentedButton(list = list, state = state, onStateChange = { state = it })
-        Spacer(modifier = Modifier.size(15.dp))
-        val switchState = remember {
-            mutableStateOf(false)
-        }
-        var mSelectedText by remember { mutableStateOf("") }
-        Spacer(modifier = Modifier.size(15.dp))
-        var mSelectedText2 by remember { mutableStateOf("") }
-        MyContent(label1 = "Company1", mSelectedText, { mSelectedText = it })
-        MyContent(label1 = "Company2", mSelectedText2, { mSelectedText2 = it })
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                tint = Color.White,
-                imageVector = Icons.Filled.DataExploration,
-                contentDescription = null
-            )
-            Switch(
-                checked = switchState.value,
-                onCheckedChange = { switchState.value = it },
-                modifier = Modifier.size(50.dp),
-                colors = SwitchDefaults.colors(uncheckedThumbColor = Color.White)
-            )
-        }
-        comparePageViewModel.onNameChange(list2)
-        comparePageViewModel.onName1Change(list3)
-        comparePageViewModel.onName2Change(list4)
-        Card(
-            Modifier
-                .padding(5.dp),
-            backgroundColor = CardColor,
-            shape = MaterialTheme.shapes.large
-        ) {
-            if (switchState.value) {
-                comparePageViewModel.name.value?.let {
-                    comparePageViewModel.name1.value?.let { it1 ->
-                        comparePageViewModel.name2.value?.let { it2 ->
-                            CompareGraph1hai(it, it1, it2)
-                        }
-                    }
-                }
-            } else {
-                comparePageViewModel.name.value?.let {
-                    comparePageViewModel.name1.value?.let { it1 ->
-                        comparePageViewModel.name2.value?.let { it2 ->
-                            CompareGraphhai(it, it1, it2)
-                        }
-                    }
-                }
-            }
-        }
-            Spacer(modifier = Modifier.size(15.dp))
-            Card(
-                Modifier
-                    .padding(5.dp)
-                    .height(700.dp),
-                backgroundColor = CardColor,
-                shape = MaterialTheme.shapes.large
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                        .padding(30.dp), horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val colorList=listOf<Color>(Purple200,Teal200)
-                    val list6= mutableListOf(100f,300f)
-                    Column(Modifier) {
-                        Progressed(radius = 260, strokeWidth = 30.dp, list6, colorList)
-                    }
-                    Spacer(modifier = Modifier.size(50.dp))
-                    Card(
-                        Modifier
-                            .padding(5.dp),
-                        backgroundColor = ElementColor,
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        LazyColumn {
-                            item() {
-                                when ((mSelectedText)) {
-                                    "C1" -> {
-                                        element(name = mSelectedText, Pic = R.drawable.m, Purple200)
-                                    }
-                                    "C2" -> {
-                                        element(name = mSelectedText, Pic = R.drawable.a, Purple200)
-                                    }
-                                    "C3" -> {
-                                        element(name = mSelectedText, Pic = R.drawable.b, Purple200)
-                                    }
-                                    else -> {
-                                        element(name = mSelectedText, Pic = R.drawable.c, Purple200)
-                                    }
-                                }
-                            }
-                            item() {
-                                when ((mSelectedText2)) {
-                                    "C1" -> {
-                                        element(name = mSelectedText2, Pic = R.drawable.m, Teal200)
-                                    }
-                                    "C2" -> {
-                                        element(name = mSelectedText2, Pic = R.drawable.a, Teal200)
-                                    }
-                                    "C3" -> {
-                                        element(name = mSelectedText2, Pic = R.drawable.b, Teal200)
-                                    }
-                                    else -> {
-                                        element(name = mSelectedText2, Pic = R.drawable.c, Teal200)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-@Composable
-fun MyContent(label1:String,mSelectedText:String,onmSelectedTextChange:(String)->Unit){
+fun MyContent(
+    label1: String,
+    mSelectedText: String,
+    onmSelectedTextChange: (String) -> Unit
+) {
     var mExpanded by remember { mutableStateOf(false) }
-    val mCities = listOf("C1", "C2", "C3", "C4")
-
-    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    val mCities = listOf<String>("ADANIENT.NS","ADANIPORTS.NS","APOLLOHOSP.NS","ASIANPAINT.NS","AXISBANK.NS","BAJAJ-AUTO.NS","BAJAJFINSV.NS","BAJFINANCE.NS","BHARTIARTL.NS","BPCL.NS","BRITANNIA.NS","CIPLA.NS","COALINDIA.NS","DIVISLAB.NS","DRREDDY.NS","EICHERMOT.NS","GAIL.NS","GRASIM.NS","HCLTECH.NS","HDFC.NS","HDFCBANK.NS","HDFCLIFE.NS","HEROMOTOCO.NS","HINDALCO.NS","HINDUNILVR.NS","ICICIBANK.NS","INDUSINDBK.NS","INFY.NS","ITC.NS","JSWSTEEL.NS","KOTAKBANK.NS","LT.NS","M&M.NS","MARUTI.NS","NESTLEIND.NS","NTPC.NS","ONGC.NS","POWERGRID.NS","RELIANCE.NS","SBILIFE.NS","SBIN.NS","SUNPHARMA.NS","TATACONSUM.NS","TATASTEEL.NS","TCS.NS","TECHM.NS","TITN.NS","ULTRACEMCO.NS","UPL.NS","WIPRO.NS")
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
     else
@@ -244,18 +322,21 @@ fun MyContent(label1:String,mSelectedText:String,onmSelectedTextChange:(String)-
 
     Column(Modifier.padding(20.dp)) {
         OutlinedTextField(
-            colors= TextFieldDefaults.outlinedTextFieldColors(textColor= White),
+            colors = TextFieldDefaults.outlinedTextFieldColors(textColor = White),
             value = mSelectedText,
-            onValueChange = {onmSelectedTextChange(it)},
+            onValueChange =
+            {
+                onmSelectedTextChange(it)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates ->
                     mTextFieldSize = coordinates.size.toSize()
                 },
             maxLines = 1,
-            label = {Text(text=label1)},
+            label = { Text(text = label1) },
             trailingIcon = {
-                Icon(icon,"contentDescription",
+                Icon(icon, "contentDescription",
                     Modifier.clickable { mExpanded = !mExpanded })
             }
         )
@@ -263,7 +344,7 @@ fun MyContent(label1:String,mSelectedText:String,onmSelectedTextChange:(String)-
             expanded = mExpanded,
             onDismissRequest = { mExpanded = false },
             modifier = Modifier
-                .width(with(LocalDensity.current){mTextFieldSize.width.toDp()})
+                .width(with(LocalDensity.current) { mTextFieldSize.width.toDp() })
         ) {
             mCities.forEach { label ->
                 DropdownMenuItem(onClick = {
@@ -277,11 +358,26 @@ fun MyContent(label1:String,mSelectedText:String,onmSelectedTextChange:(String)-
     }
 }
 @Composable
-fun CompareGraphhai(list: List<Float>,list2:List<String>,list3:List<Float>){
-    val list1=listOf("$250","$200","$150","$100","$50","$0")
-    var canvasHeight=0f
-    var canvasWidth=0f
-    var columnWidth=0f
+fun CompareGraphhai(list: List<Float>, list2: List<String>, list3: List<Float>) {
+    val Min=min(list.min(),list3.min())
+    val Max=max(list.max(),list3.max())
+    val list1=when {
+        list.isEmpty() -> listOf("0", "50", "100", "150", "250")
+        else -> {
+            listOf(
+                "${Min.toInt()}",
+                "${(Min + ((Max - Min) / 5)).toInt()}",
+                "${(Min + (2 * (Max - Min) / 5)).toInt()}",
+                "${(Min + (3 * (Max - Min) / 5)).toInt()}",
+                "${(Min + (4 * (Max - Min) / 5)).toInt()}",
+                "${(Max).toInt()}",
+
+                )
+        }
+    }
+    var canvasHeight = 0f
+    var canvasWidth = 0f
+    var columnWidth = 0f
     Column() {
         Row(Modifier.padding(15.dp)) {
             Column(
@@ -309,72 +405,109 @@ fun CompareGraphhai(list: List<Float>,list2:List<String>,list3:List<Float>){
                             strokeWidth = 5f
                         )
                         var space = 30f
-                        for (i in list.indices) {
+                        for (i in 0 until min(list.size,min(list2.size,list3.size))) {
                             drawRoundRect(
-                                cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
+                                cornerRadius = CornerRadius(
+                                    canvasWidth / 25f,
+                                    canvasWidth / 25f
+                                ),
                                 topLeft = Offset(
                                     x = space,
                                     y = 0f
                                 ),
                                 color = BackgroundColor,
                                 size = Size(
-                                    width = (max(1f, ((canvasWidth / (list.size*2)) - 35f))),
+                                    width = (max(
+                                        1f,
+                                        ((canvasWidth / (list.size * 2)) - 35f)
+                                    )),
                                     height = (canvasHeight)
                                 )
                             )
                             drawRoundRect(
-                                cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
+                                cornerRadius = CornerRadius(
+                                    canvasWidth / 25f,
+                                    canvasWidth / 25f
+                                ),
                                 topLeft = Offset(
-                                    x = space + max(1f, ((canvasWidth / (list.size*2)) - 30f)),
+                                    x = space + max(
+                                        1f,
+                                        ((canvasWidth / (list.size * 2)) - 30f)
+                                    ),
                                     y = 0f
                                 ),
                                 color = BackgroundColor,
                                 size = Size(
-                                    width = (max(1f, ((canvasWidth / (list.size*2)) - 35f))),
+                                    width = (max(
+                                        1f,
+                                        ((canvasWidth / (list.size * 2)) - 35f)
+                                    )),
                                     height = (canvasHeight)
                                 )
                             )
                             drawRoundRect(
-                                cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
+                                cornerRadius = CornerRadius(
+                                    canvasWidth / 25f,
+                                    canvasWidth / 25f
+                                ),
                                 topLeft = Offset(
                                     x = space,
-                                    y = (canvasHeight - ((canvasHeight / 250f) * list[i]))
+                                    y = (canvasHeight - ((canvasHeight / Max) * list[i]))
                                 ),
                                 color = Teal200,
                                 size = Size(
-                                    width = (max(1f, ((canvasWidth / (list.size*2)) - 35f))),
-                                    height = ((canvasHeight / 250f) * list[i])
+                                    width = (max(
+                                        1f,
+                                        ((canvasWidth / (list.size * 2)) - 35f)
+                                    )),
+                                    height = ((canvasHeight / Max) * list[i])
                                 )
                             )
                             drawRoundRect(
-                                cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
+                                cornerRadius = CornerRadius(
+                                    canvasWidth / 25f,
+                                    canvasWidth / 25f
+                                ),
                                 topLeft = Offset(
-                                    x = space + max(1f, ((canvasWidth / (list.size*2)) - 30f)),
-                                    y = (canvasHeight - ((canvasHeight / 250f) * list3[i]))
+                                    x = space + max(
+                                        1f,
+                                        ((canvasWidth / (list.size * 2)) - 30f)
+                                    ),
+                                    y = (canvasHeight - ((canvasHeight / Max) * list3[i]))
                                 ),
                                 color = Purple200,
                                 size = Size(
-                                    width = (max(1f, ((canvasWidth / (list.size*2)) - 35f))),
-                                    height = ((canvasHeight / 250f) * list3[i])
+                                    width = (max(
+                                        1f,
+                                        ((canvasWidth / (list.size * 2)) - 35f)
+                                    )),
+                                    height = ((canvasHeight / Max) * list3[i])
                                 )
                             )
-
-                            val rect = Rect(Offset(
-                                x = space,
-                                y = (canvasHeight)+40f
-                            ), size)
-                            drawIntoCanvas { canvas ->
-                                rotate(degrees = 90f, Offset(
+                            val rect = Rect(
+                                Offset(
                                     x = space,
-                                    y = (canvasHeight)+40f)) {
+                                    y = (canvasHeight) + 40f
+                                ), size
+                            )
+                            drawIntoCanvas { canvas ->
+                                rotate(
+                                    degrees = 90f, Offset(
+                                        x = space,
+                                        y = (canvasHeight) + 40f
+                                    )
+                                ) {
                                     canvas.nativeCanvas.drawText(
                                         list2[i],
                                         rect.left, rect.top,
                                         Paint().apply {
                                             color = Color.White.toArgb()
                                             textSize =
-                                                if(list2.size>20){20f}
-                                                else{50f}
+                                                if (list2.size > 20) {
+                                                    20f
+                                                } else {
+                                                    50f
+                                                }
                                         }
                                     )
                                 }
@@ -388,15 +521,29 @@ fun CompareGraphhai(list: List<Float>,list2:List<String>,list3:List<Float>){
                             strokeWidth = 5f
                         )
                     }
-
                 }
             }
         }
     }
 }
 @Composable
-fun CompareGraph1hai(list: List<Float>,list2:List<String>,list3: List<Float>) {
-    val list1 = listOf("$250", "$200", "$150", "$100", "$50", "$0")
+fun CompareGraph1hai(list: List<Float>, list2: List<String>, list3: List<Float>) {
+    val Min=min(list.min(),list3.min())
+    val Max=max(list.max(),list3.max())
+    val list1=when {
+        list.isEmpty() -> listOf("0", "50", "100", "150", "250")
+        else -> {
+            listOf(
+                "${Min.toInt()}",
+                "${(Min + ((Max - Min) / 5)).toInt()}",
+                "${(Min + (2 * (Max - Min) / 5)).toInt()}",
+                "${(Min + (3 * (Max - Min) / 5)).toInt()}",
+                "${(Min + (4 * (Max - Min) / 5)).toInt()}",
+                "${(Max).toInt()}",
+
+                )
+        }
+    }
     var canvasHeight = 0f
     var canvasWidth = 0f
     var columnWidth = 0f
@@ -416,7 +563,6 @@ fun CompareGraph1hai(list: List<Float>,list2:List<String>,list3: List<Float>) {
                     val animationProgress = remember {
                         Animatable(0f)
                     }
-
                     LaunchedEffect(key1 = list, block = {
                         animationProgress.animateTo(1f, tween(3000))
                     })
@@ -435,7 +581,7 @@ fun CompareGraph1hai(list: List<Float>,list2:List<String>,list3: List<Float>) {
                         var previousBalanceY1 = canvasHeight
                         val max = list.maxBy { it }
                         val range = max
-                        val heightPxPerAmount = canvasHeight / 250f
+                        val heightPxPerAmount = canvasHeight / Max
                         drawLine(
                             start = Offset(x = 0f, y = 0f),
                             end = Offset(x = 0f, y = canvasHeight),
@@ -444,10 +590,10 @@ fun CompareGraph1hai(list: List<Float>,list2:List<String>,list3: List<Float>) {
                         )
                         var space = 30f
                         val path = Path()
-                        val path2=Path()
-                        path.moveTo(0f,canvasHeight)
-                        path2.moveTo(0f,canvasHeight)
-                        for (i in 0..list.size - 1) {
+                        val path2 = Path()
+                        path.moveTo(0f, canvasHeight)
+                        path2.moveTo(0f, canvasHeight)
+                        for (i in 0 until min(list.size,min(list2.size,list3.size))) {
                             val balanceX = i * weekWidth
                             val balanceY = canvasHeight - (list[i]) * heightPxPerAmount
                             val balanceY1 = canvasHeight - (list3[i]) * heightPxPerAmount
@@ -455,7 +601,6 @@ fun CompareGraph1hai(list: List<Float>,list2:List<String>,list3: List<Float>) {
                                 PointF((balanceX + previousBalanceX) / 2f, previousBalanceY)
                             val controlPoint2 =
                                 PointF((balanceX + previousBalanceX) / 2f, balanceY)
-
                             val controlPoint3 =
                                 PointF((balanceX + previousBalanceX) / 2f, previousBalanceY1)
                             val controlPoint4 =
@@ -519,18 +664,16 @@ fun CompareGraph1hai(list: List<Float>,list2:List<String>,list3: List<Float>) {
                             drawPath(path, Teal200, style = Stroke(2.dp.toPx()))
                             drawPath(path2, Purple200, style = Stroke(2.dp.toPx()))
                         }
-
                     }
                 }
             }
         }
     }
 }
-@Preview
-@Composable
-fun PreviewedHaiYeTho(){
-    StockMarketPricePredictor20Theme {
-        val comparePageViewModel:ComparePageViewModel= viewModel()
-        ComparePage(comparePageViewModel)
-    }
-}
+//@Preview
+//@Composable
+//fun PreviewedHaiYeTho(){
+//    StockMarketPricePredictor20Theme {
+//        ComparePage()
+//    }
+//}

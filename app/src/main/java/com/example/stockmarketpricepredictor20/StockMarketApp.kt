@@ -232,8 +232,8 @@ fun StockMarketApp(
                     currentActive.value=1
                 }
                 composable(route = StockScreen.Compare.name) {
-                    val comparePageViewModel: ComparePageViewModel = viewModel()
-                    ComparePage(comparePageViewModel)
+                    val comparePageViewModel: StatsViewModel = viewModel()
+                    ComparePage(comparePageViewModel,statsViewModel)
                     bottomBarState.value=true
                     topBarState.value=true
                     currentActive.value=2
