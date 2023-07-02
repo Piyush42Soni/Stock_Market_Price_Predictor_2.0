@@ -224,6 +224,7 @@ fun StockMarketApp(
                         statsViewModel.gworth=it2
                         statsViewModel.getSymbol(statsViewModel.companyName)
                         statsViewModel.getStockShareHoldingPatternData()
+                        statsViewModel.getStockIndexTrendData()
                         navController.navigate(StockScreen.Stats.name)
                     })
                     bottomBarState.value=true

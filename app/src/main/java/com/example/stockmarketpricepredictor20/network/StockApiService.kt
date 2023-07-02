@@ -2,6 +2,7 @@ package com.example.stockmarketpricepredictor20.network
 
 import com.example.stockmarketpricepredictor20.data.CurrentData
 import com.example.stockmarketpricepredictor20.data.HistoricalData
+import com.example.stockmarketpricepredictor20.data.IndexTrendData
 import com.example.stockmarketpricepredictor20.data.ShareHoldingPatternData
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -9,7 +10,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 private const val BASE_URL1 =
     "https://query1.finance.yahoo.com/v10/finance/quoteSummary/"
@@ -35,6 +35,8 @@ private val retrofit1 = Retrofit.Builder()
 interface StockApiService {
     @GET("{symbol}?modules=financialData")
     suspend fun getCurrentData(@Path("symbol") s:String): CurrentData
+    @GET("{symbol}?modules=indexTrend")
+    suspend fun getIndexTrend(@Path("symbol") s:String): IndexTrendData
     @GET("{symbol}?modules=majorHoldersBreakdown")
     suspend fun getShareHoldingPattern(@Path("symbol") s:String): ShareHoldingPatternData
     @GET("{symbol}?metrics=high?&interval=15m&range=1d")
@@ -45,6 +47,7 @@ interface StockApiService {
     suspend fun getHistoricalDataYearly(@Path("symbol") s:String): HistoricalData
     @GET("{symbol}?metrics=high?&interval=1d&range=5d")
     suspend fun getHistoricalDataWeekly(@Path("symbol") s:String): HistoricalData
+
 }
 
 /**

@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.stockmarketpricepredictor20.data.CurrentData
 import com.example.stockmarketpricepredictor20.data.HistoricalData
+import com.example.stockmarketpricepredictor20.data.IndexTrendData
 import com.example.stockmarketpricepredictor20.data.ShareHoldingPatternData
 import com.example.stockmarketpricepredictor20.network.StockApi
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ class StatsViewModel : ViewModel() {
     var gworth:Float by mutableStateOf(0f)
     var shareHoldingPatternData:ShareHoldingPatternData by mutableStateOf(ShareHoldingPatternData())
     var stockUiState: StockUiState1 by mutableStateOf(StockUiState1.Loading)
-    var range:Int by mutableStateOf(1)
+    var indexTrendData:IndexTrendData by mutableStateOf(IndexTrendData())
     private var stockSymbol=MutableLiveData<String>()
 //    var statement: HistoricalData by mutableStateOf(HistoricalData())
 
@@ -37,6 +38,7 @@ class StatsViewModel : ViewModel() {
         else {
             getSymbol(companyName)
             getStockShareHoldingPatternData()
+            getStockIndexTrendData()
         }
     }
     fun getStockPhotos() {
@@ -69,6 +71,19 @@ class StatsViewModel : ViewModel() {
                 ShareHoldingPatternData()
             } catch (e: HttpException) {
                 ShareHoldingPatternData()
+            }
+        }
+    }
+    fun getStockIndexTrendData() {
+        viewModelScope.launch {
+            indexTrendData = try {
+                companyName.let {
+                    StockApi.retrofitService.getIndexTrend(it)
+                }
+            } catch (e: IOException) {
+                IndexTrendData()
+            } catch (e: HttpException) {
+                IndexTrendData()
             }
         }
     }

@@ -118,8 +118,8 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                 mutableStateOf(mutableListOf())
             }
 
-            when (statsViewModel.range) {
-                1 -> {
+            when (state) {
+                0 -> {
                     lateinit var d:Date
                     list3= mutableListOf()
                     for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
@@ -128,7 +128,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                     }
                 }
 
-                2 -> {
+                1 -> {
                     list3.clear()
                     for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                         val d = Date(i.toLong()*1000)
@@ -144,7 +144,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                     }
                 }
 
-                3 -> {
+                2 -> {
                     list3= mutableListOf()
                     for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                         val d = Date(i.toLong()*1000)
@@ -176,7 +176,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                 }
             }
             val CompanyDetails =
-                listOf<Float>(1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f, 11f, 12f, 13f, 14f, 15f, 16f)
+                listOf<Float>(statsViewModel.indexTrendData.quoteSummary.result[0].indexTrend.peRatio.raw,statsViewModel.indexTrendData.quoteSummary.result[0].indexTrend.pegRatio.raw)
             Spacer(modifier = Modifier.size(15.dp))
             val switchState = remember {
                 mutableStateOf(false)
@@ -303,51 +303,51 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                     }
                 }
             }
-            Card(
-                Modifier
-                    .height(700.dp)
-                    .padding(25.dp),
-                backgroundColor = ElementColor,
-                shape = MaterialTheme.shapes.medium
-            ) {
-                LazyColumn {
-                    items(count = 10) {
-                        when ((it % 4)) {
-                            0 -> {
-                                element(
-                                    name = companyName1[(it % 4)],
-                                    Pic = R.drawable.m,
-                                    colorList[(it % 4)]
-                                )
-                            }
-
-                            1 -> {
-                                element(
-                                    name = companyName1[(it % 4)],
-                                    Pic = R.drawable.b,
-                                    colorList[(it % 4)]
-                                )
-                            }
-
-                            2 -> {
-                                element(
-                                    name = companyName1[(it % 4)],
-                                    Pic = R.drawable.c,
-                                    colorList[(it % 4)]
-                                )
-                            }
-
-                            else -> {
-                                element(
-                                    name = companyName1[(it % 4)],
-                                    Pic = R.drawable.a,
-                                    colorList[(it % 4)]
-                                )
-                                }
-                            }
-                        }
-                    }
-                }
+//            Card(
+//                Modifier
+//                    .height(700.dp)
+//                    .padding(25.dp),
+//                backgroundColor = ElementColor,
+//                shape = MaterialTheme.shapes.medium
+//            ) {
+//                LazyColumn {
+//                    items(count = 10) {
+//                        when ((it % 4)) {
+//                            0 -> {
+//                                element(
+//                                    name = companyName1[(it % 4)],
+//                                    Pic = R.drawable.m,
+//                                    colorList[(it % 4)]
+//                                )
+//                            }
+//
+//                            1 -> {
+//                                element(
+//                                    name = companyName1[(it % 4)],
+//                                    Pic = R.drawable.b,
+//                                    colorList[(it % 4)]
+//                                )
+//                            }
+//
+//                            2 -> {
+//                                element(
+//                                    name = companyName1[(it % 4)],
+//                                    Pic = R.drawable.c,
+//                                    colorList[(it % 4)]
+//                                )
+//                            }
+//
+//                            else -> {
+//                                element(
+//                                    name = companyName1[(it % 4)],
+//                                    Pic = R.drawable.a,
+//                                    colorList[(it % 4)]
+//                                )
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
             }
         }
         is StockUiState1.Loading-> LoadingScreen()
@@ -766,49 +766,44 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
 }
 @Composable
 fun Details(list:List<Float>){
-    val list1=listOf<String>("Market Cap","Enterprise Value","No. of shares","P/E","P/B","Face Value","Div. Yield","Book Value","Cash","Debt","Promoter Holding","EPS","Sales Growth","ROE","ROCE","Profit Growth")
+    val list1=listOf<String>("P/E Ratio","PEG Ratio")
     Card(
         Modifier
-            .size(850.dp)
+            .height(250.dp)
+            .fillMaxWidth()
             .padding(5.dp),
         backgroundColor = CardColor,
         shape = MaterialTheme.shapes.large
     ) {
-        Column(){
-            for(i in 0..14){
-                Row(modifier = Modifier.fillMaxWidth()){
-                    Column(
-                        Modifier
-                            .padding(15.dp)
-                            .weight(0.5f)) {
-                        Text(list1[i], color = Teal200)
-                        Spacer(modifier = Modifier.size(5.dp))
-                        Text(
-                            modifier = Modifier.padding(start = 15.dp),
-                            text = list[i].toString(),
-                            color = White
-                        )
-                        Spacer(modifier = Modifier.size(30.dp))
-                    }
-                    Column(
-                        Modifier
-                            .padding(15.dp)
-                            .weight(0.5f)) {
-                        Text(list1[i+1], color = Teal200)
-                        Spacer(modifier = Modifier.size(5.dp))
-                        Text(
-                            modifier = Modifier.padding(start = 15.dp),
-                            text = list[i+1].toString(),
-                            color = White
-                        )
-                        Spacer(modifier = Modifier.size(30.dp))
-                    }
-                    i.inc()
+            Column(modifier = Modifier.fillMaxWidth()){
+                Column(
+                    Modifier
+                        .padding(15.dp)
+                        .weight(0.5f)) {
+                    Text(list1[0], color = Teal200)
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Text(
+                        modifier = Modifier.padding(start = 15.dp),
+                        text = list[0].toString(),
+                        color = White
+                    )
+                    Spacer(modifier = Modifier.size(30.dp))
                 }
-
+                Column(
+                    Modifier
+                        .padding(15.dp)
+                        .weight(0.5f)) {
+                    Text(list1[1], color = Teal200)
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Text(
+                        modifier = Modifier.padding(start = 15.dp),
+                        text = list[1].toString(),
+                        color = White
+                    )
+                    Spacer(modifier = Modifier.size(30.dp))
+                }
             }
         }
-    }
 }
 @Composable
 fun Sharelement(name:String, @DrawableRes Pic:Int, color:Color){
