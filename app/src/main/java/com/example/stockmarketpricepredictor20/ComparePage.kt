@@ -39,6 +39,8 @@ import kotlin.math.min
 
 @Composable
 fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) {
+    var mSelectedText:String by rememberSaveable{ mutableStateOf("ADANIENT.NS") }
+    var mSelectedText2:String by rememberSaveable{ mutableStateOf("ADANIENT.NS") }
     when (statsViewModel.stockUiState) {
         is StockUiState1.Loading -> LoadingScreen()
         is StockUiState1.Success -> {
@@ -155,9 +157,7 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
                         val switchState = remember {
                             mutableStateOf(false)
                         }
-                        var mSelectedText by rememberSaveable{ mutableStateOf("ADANIENT.NS") }
                         Spacer(modifier = Modifier.size(15.dp))
-                        var mSelectedText2 by rememberSaveable{ mutableStateOf("ADANIENT.NS") }
                         MyContent(label1 = "Company1", mSelectedText) {
                             mSelectedText = it
                             statsViewModel.getSymbol(it)
@@ -313,7 +313,7 @@ fun MyContent(
     onmSelectedTextChange: (String) -> Unit
 ) {
     var mExpanded by remember { mutableStateOf(false) }
-    val mCities = listOf<String>("ADANIENT.NS","ADANIPORTS.NS","APOLLOHOSP.NS","ASIANPAINT.NS","AXISBANK.NS","BAJAJ-AUTO.NS","BAJAJFINSV.NS","BAJFINANCE.NS","BHARTIARTL.NS","BPCL.NS","BRITANNIA.NS","CIPLA.NS","COALINDIA.NS","DIVISLAB.NS","DRREDDY.NS","EICHERMOT.NS","GAIL.NS","GRASIM.NS","HCLTECH.NS","HDFC.NS","HDFCBANK.NS","HDFCLIFE.NS","HEROMOTOCO.NS","HINDALCO.NS","HINDUNILVR.NS","ICICIBANK.NS","INDUSINDBK.NS","INFY.NS","ITC.NS","JSWSTEEL.NS","KOTAKBANK.NS","LT.NS","M&M.NS","MARUTI.NS","NESTLEIND.NS","NTPC.NS","ONGC.NS","POWERGRID.NS","RELIANCE.NS","SBILIFE.NS","SBIN.NS","SUNPHARMA.NS","TATACONSUM.NS","TATASTEEL.NS","TCS.NS","TECHM.NS","TITN.NS","ULTRACEMCO.NS","UPL.NS","WIPRO.NS")
+    val mCities = listOf("ADANIENT.NS","ADANIPORTS.NS","APOLLOHOSP.NS","ASIANPAINT.NS","AXISBANK.NS","BAJAJ-AUTO.NS","BAJAJFINSV.NS","BAJFINANCE.NS","BHARTIARTL.NS","BPCL.NS","BRITANNIA.NS","CIPLA.NS","COALINDIA.NS","DIVISLAB.NS","DRREDDY.NS","EICHERMOT.NS","GAIL.NS","GRASIM.NS","HCLTECH.NS","HDFC.NS","HDFCBANK.NS","HDFCLIFE.NS","HEROMOTOCO.NS","HINDALCO.NS","HINDUNILVR.NS","ICICIBANK.NS","INDUSINDBK.NS","INFY.NS","ITC.NS","JSWSTEEL.NS","KOTAKBANK.NS","LT.NS","M&M.NS","MARUTI.NS","NESTLEIND.NS","NTPC.NS","ONGC.NS","POWERGRID.NS","RELIANCE.NS","SBILIFE.NS","SBIN.NS","SUNPHARMA.NS","TATACONSUM.NS","TATASTEEL.NS","TCS.NS","TECHM.NS","TITN.NS","ULTRACEMCO.NS","UPL.NS","WIPRO.NS")
     var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
@@ -366,13 +366,9 @@ fun CompareGraphhai(list: List<Float>, list2: List<String>, list3: List<Float>) 
         else -> {
             listOf(
                 "${Min.toInt()}",
-                "${(Min + ((Max - Min) / 5)).toInt()}",
-                "${(Min + (2 * (Max - Min) / 5)).toInt()}",
-                "${(Min + (3 * (Max - Min) / 5)).toInt()}",
-                "${(Min + (4 * (Max - Min) / 5)).toInt()}",
-                "${(Max).toInt()}",
-
-                )
+                "${(Min + ((Max - Min) / 2)).toInt()}",
+                "${(Max).toInt()}"
+            )
         }
     }
     var canvasHeight = 0f
@@ -670,10 +666,17 @@ fun CompareGraph1hai(list: List<Float>, list2: List<String>, list3: List<Float>)
         }
     }
 }
-//@Preview
-//@Composable
-//fun PreviewedHaiYeTho(){
-//    StockMarketPricePredictor20Theme {
-//        ComparePage()
-//    }
-//}
+@Preview
+@Composable
+fun PreviewedHaiYeTho(){
+    StockMarketPricePredictor20Theme {
+        var name:String by rememberSaveable {
+            mutableStateOf("")
+        }
+        MyContent(
+            "YOHO",
+            name,
+            {name=it}
+        )
+    }
+}

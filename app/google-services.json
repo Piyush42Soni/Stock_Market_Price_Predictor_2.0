@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "561155697783",
+    "project_id": "stock-market-price-predictor",
+    "storage_bucket": "stock-market-price-predictor.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:561155697783:android:172527500b0a762e486a72",
+        "android_client_info": {
+          "package_name": "com.example.stockmarketpricepredictor20"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "561155697783-r5id2tdg85juuo5jc327gs70q9f57dhf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.stockmarketpricepredictor20",
+            "certificate_hash": "7d0bafb4348028b1bb0be1e8e43f487f0cb1c1ac"
+          }
+        },
+        {
+          "client_id": "561155697783-2g6u299l60rgfr4q2h7j2d3735im5bl0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIj6ShH3PJIPHr4bdc2zZUHXJkSjv60N4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561155697783-2g6u299l60rgfr4q2h7j2d3735im5bl0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
