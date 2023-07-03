@@ -37,6 +37,7 @@ android {
     }
     buildFeatures {
         compose true
+        mlModelBinding true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.2.0'
@@ -57,6 +58,9 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
     implementation 'androidx.compose.material:material:1.2.0'
     implementation 'com.google.firebase:firebase-crashlytics-buildtools:2.8.1'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
+    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -80,4 +84,9 @@ dependencies {
     //firebase
     implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
     implementation("com.google.firebase:firebase-analytics-ktx")
+    // Also add the dependency for the TensorFlow Lite library and specify its version
+    implementation 'com.google.firebase:firebase-ml-modeldownloader-ktx:24.1.2'
+
+    //TensorFlow Lite
+    implementation("org.tensorflow:tensorflow-lite:2.3.0")
 }
