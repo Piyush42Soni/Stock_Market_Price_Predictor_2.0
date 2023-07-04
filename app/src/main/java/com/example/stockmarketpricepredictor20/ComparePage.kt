@@ -2,6 +2,7 @@ package com.example.stockmarketpricepredictor20
 
 import android.graphics.Paint
 import android.graphics.PointF
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -31,8 +32,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stockmarketpricepredictor20.ui.theme.*
+import kotlinx.coroutines.launch
 import java.lang.Float.max
 import java.util.*
 import kotlin.math.min
@@ -46,6 +49,7 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
         is StockUiState1.Success -> {
             when (statsViewModel2.stockUiState) {
                 is StockUiState1.Success -> {
+                    Log.d("GOHO", (statsViewModel.stockUiState as StockUiState1.Success).photos.size.toString())
                     val list = listOf<String>("1D", "1W", "1M", "1Y")
                     var state by remember {
                         mutableStateOf(0)
@@ -126,23 +130,33 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
 
                     val list2 =
                         ((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-
-                    list2.replaceAll { it ?: statsViewModel.currentData.toFloat() }
+                    var x=0f
+                    for(i in list2){
+                        if(i!=null){
+                            x=i
+                        }
+                    }
+                    list2.replaceAll { it ?: x }
                     list2 as List<Float>
                     val list4 =
                         ((statsViewModel2.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-
-                    list4.replaceAll { it ?: statsViewModel2.currentData.toFloat() }
+                    var y=0f
+                    for(i in list4){
+                        if(i!=null){
+                            y=i
+                        }
+                    }
+                    list4.replaceAll { it ?: y }
                     list4 as List<Float>
                     val c=((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                    c.replaceAll{it?:statsViewModel.currentData.toFloat()}
+                    c.replaceAll{it?:x}
                     c as MutableList<Float>
                     c.replaceAll { it-list2.min() }
                     c.reverse()
                     list3.reverse()
 
                     val c1=((statsViewModel2.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                    c1.replaceAll{it?:statsViewModel2.currentData.toFloat()}
+                    c1.replaceAll{it?:y}
                     c1 as MutableList<Float>
                     c1.replaceAll { it-list4.min() }
                     c1.reverse()
@@ -160,11 +174,15 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
                         Spacer(modifier = Modifier.size(15.dp))
                         MyContent(label1 = "Company1", mSelectedText) {
                             mSelectedText = it
-                            statsViewModel.getSymbol(it)
+                            statsViewModel.viewModelScope.launch {
+                                statsViewModel.getSymbol(it)
+                            }
                         }
                         MyContent(label1 = "Company2", mSelectedText2) {
                             mSelectedText2 = it
-                            statsViewModel2.getSymbol(it)
+                            statsViewModel2.viewModelScope.launch {
+                                statsViewModel2.getSymbol(it)
+                            }
                         }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
