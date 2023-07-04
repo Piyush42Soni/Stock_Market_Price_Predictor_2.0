@@ -4,10 +4,7 @@ package com.example.stockmarketpricepredictor20
 import android.annotation.SuppressLint
 import android.graphics.Paint
 import android.graphics.PointF
-import android.util.Log
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.*
@@ -34,14 +31,11 @@ import androidx.compose.ui.graphics.drawscope.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.stockmarketpricepredictor20.ui.theme.*
 import java.lang.Float.max
-import java.lang.Float.min
-import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.min
 
 
 @Composable
@@ -106,7 +100,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Triangle(radius = 50)
                     AdjustText(
-                        text = "-$statsViewModel.currentData.quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw.toString()",
+                        text = "${statsViewModel.gworth}",
                         color = Color.Red,
                         textStyleBody1 = Typography.h6
                     )
@@ -138,7 +132,9 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                                 1 -> "Tue"
                                 2 -> "Wed"
                                 3 -> "Thu"
-                                else -> "Fri"
+                                4 -> "Fri"
+                                5 -> "Sat"
+                                else -> "Sun"
                             }
                         )
                     }
@@ -157,7 +153,7 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                     for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                         val d = Date(i.toLong()*1000)
                         list3.add(
-                            when (d.day) {
+                            when (d.month) {
                                 0 -> "Jan"
                                 1 -> "Feb"
                                 2 -> "Mar"
@@ -201,7 +197,6 @@ fun StatsPage(statsViewModel: StatsViewModel) {
             }
             val list2= ((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
             list2.replaceAll{it?:statsViewModel.currentData.toFloat()}
-            list2 as List<Float>
 
             Card(
                 Modifier
@@ -210,8 +205,44 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                 shape = MaterialTheme.shapes.large
             ) {
                 val c=((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                c.replaceAll{it?:statsViewModel.currentData.toFloat()}
+                for(i in c.indices){
+                    if(i==0 && c[i]==null){
+                        var y=1
+                        while(y<c.size && c[y]==null){
+                            y++
+                        }
+                        if(y<c.size) {
+                            c[i] = c[y]
+                            list2[i] = c[y]
+                        }
+                        else{
+                            c[i]=0f
+                            list2[i]=0f
+                        }
+                    }
+                    else if(c[i]==null){
+                        var y=i-1
+                        while(y>=0 && c[y]==null){
+                            y--
+                        }
+                        if(y==-1){
+                            y=0
+                            while(y<c.size && c[y]==null){
+                                y++
+                            }
+                        }
+                        if(y<c.size) {
+                            c[i] = c[y]
+                            list2[i] = c[y]
+                        }
+                        else{
+                            c[i]=0f
+                            list2[i]=0f
+                        }
+                    }
+                }
                 c as MutableList<Float>
+                list2 as List<Float>
                 c.replaceAll { it-list2.min() }
                 c.reverse()
                 list3.reverse()
@@ -267,33 +298,33 @@ fun StatsPage(statsViewModel: StatsViewModel) {
                             items(count = companyName.size) {
                                 when ((it % 4)) {
                                     0 -> {
-                                        Sharelement(
+                                        sharElement(
                                             name = companyName[(it % 4)],
-                                            Pic = R.drawable.m,
+                                            Pic = R.drawable.adanient,
                                             colorList[(it % 4)]
                                         )
                                     }
 
                                     1 -> {
-                                        Sharelement(
+                                        sharElement(
                                             name = companyName[(it % 4)],
-                                            Pic = R.drawable.b,
+                                            Pic = R.drawable.adanient,
                                             colorList[(it % 4)]
                                         )
                                     }
 
                                     2 -> {
-                                        Sharelement(
+                                        sharElement(
                                             name = companyName[(it % 4)],
-                                            Pic = R.drawable.c,
+                                            Pic = R.drawable.adanient,
                                             colorList[(it % 4)]
                                         )
                                     }
 
                                     else -> {
-                                        Sharelement(
+                                        sharElement(
                                             name = companyName[(it % 4)],
-                                            Pic = R.drawable.a,
+                                            Pic = R.drawable.adanient,
                                             colorList[(it % 4)]
                                         )
                                     }
@@ -452,11 +483,11 @@ fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
         list.isEmpty() -> listOf("0", "50", "100", "150", "250")
         else -> listOf(
             "${(Min).toInt()}",
-            "${(Min+((Max-Min) / 5)).toInt()}",
+            "${(Min+((Max-Min) / 5))}",
             "${(Min+(2*(Max-Min) / 5)).toInt()}",
             "${(Min+(3*(Max-Min) / 5)).toInt()}",
-            "${(Min+(4*(Max-Min) / 5)).toInt()}",
-            "${(Max).toInt()}",
+            "${(Min+(4*(Max-Min) / 5))}",
+            "${(Max)}",
 
         )
     }
@@ -488,7 +519,7 @@ fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
                         canvasHeight = size.width/2
                         canvasWidth = size.width
                         var space = 30f
-                        for (i in list.indices) {
+                        for (i in 0..(min(list.size,list2.size)-1).toInt()) {
                             drawRoundRect(
                                 cornerRadius= CornerRadius(canvasWidth/25f,canvasWidth/25f),
                                 topLeft = Offset(
@@ -497,7 +528,7 @@ fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
                                 ),
                                 color = BackgroundColor,
                                 size = Size(
-                                    width = (max(1f, ((canvasWidth / list.size) - 60f))),
+                                    width = (max(1f, ((canvasWidth / min(list.size,list2.size)) - 60f))),
                                     height = (canvasHeight)
                                 )
                             )
@@ -509,7 +540,7 @@ fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
                                 ),
                                 color = Teal200,
                                 size = Size(
-                                    width = (max(1f, ((canvasWidth / list.size) - 60f))),
+                                    width = (max(1f, ((canvasWidth / min(list.size,list2.size)) - 60f))),
                                     height = ((canvasHeight / (list.max())) * list[i])
                                 )
                             )
@@ -528,12 +559,12 @@ fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
                                             color = Color.White.toArgb()
                                             textSize =
                                                 if(list2.size>20){20f}
-                                                else{50f}
+                                                else{25f}
                                         }
                                     )
                                 }
                             }
-                            space += (max(1f, ((canvasWidth / list.size))))
+                            space += (max(1f, ((canvasWidth / min(list.size,list2.size)))))
                             }
                         drawLine(
                             start = Offset(x = 0f, y = canvasHeight),
@@ -573,7 +604,7 @@ fun Graphhai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int){
                                         rect1.left, rect1.top,
                                         Paint().apply {
                                             color = Color.White.toArgb()
-                                            textSize = 50f
+                                            textSize = 25f
                                         }
                                     )
                                 }
@@ -614,7 +645,7 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
 //                }
 //            }
             Spacer(modifier = Modifier.size(10.dp))
-            Column() {
+            Column(Modifier.fillMaxHeight().weight(0.8f)) {
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
 
 
@@ -646,7 +677,7 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
                         val FilledPath=Path()
                         FilledPath.moveTo(0f,canvasHeight)
                         path.moveTo(0f,canvasHeight)
-                        for (i in 0..list.size - 1) {
+                        for (i in 0 until min(list.size,list2.size)) {
                                 val balanceX = i * weekWidth
                                 val balanceY = canvasHeight - (list[i]) * heightPxPerAmount
                                 val controlPoint1 =
@@ -672,14 +703,14 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
                                 val rect = Rect(
                                     Offset(
                                         x = balanceX,
-                                        y = (canvasHeight) + 40f
+                                        y = (canvasHeight) + 15f
                                     ), size
                                 )
                                 drawIntoCanvas { canvas ->
                                     rotate(
                                         degrees = 90f, Offset(
                                             x = balanceX - 20f,
-                                            y = (canvasHeight) + 40f
+                                            y = (canvasHeight) + 15f
                                         )
                                     ) {
                                         canvas.nativeCanvas.drawText(
@@ -691,14 +722,14 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
                                                     if (list2.size > 20) {
                                                         20f
                                                     } else {
-                                                        50f
+                                                        25f
                                                     }
                                             }
                                         )
                                     }
                                 previousBalanceX = balanceX
                                 previousBalanceY = balanceY
-                                space += (java.lang.Float.max(1f, ((canvasWidth / list.size))))
+                                space += (java.lang.Float.max(1f, ((canvasWidth / min(list.size,list2.size)))))
                             }
                         }
                         drawLine(
@@ -732,7 +763,7 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
             Canvas(
                 modifier = Modifier
                     .height(canvasHeight.dp)
-                    .width(50.dp)
+                    .weight(0.2f)
             ) {
                 canvasWidth = size.width
                 var space = 0f
@@ -753,7 +784,7 @@ fun Graph1hai(list: MutableList<Float>,list2:List<String>,Min:Int,Max:Int) {
                                 rect1.left, rect1.top,
                                 Paint().apply {
                                     color = Color.White.toArgb()
-                                    textSize = 50f
+                                    textSize = 25f
                                 }
                             )
                         }
@@ -806,7 +837,7 @@ fun Details(list:List<Float>){
         }
 }
 @Composable
-fun Sharelement(name:String, @DrawableRes Pic:Int, color:Color){
+fun sharElement(name:String, @DrawableRes Pic:Int, color:Color){
     Card(
         Modifier
             .fillMaxWidth()

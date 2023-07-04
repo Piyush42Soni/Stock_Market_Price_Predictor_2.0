@@ -71,7 +71,7 @@ class HomeViewModel : ViewModel() {
                     StockUiState.Error
                 }
             }
-            delay(1000*60*15)
+            delay(1000*60*5)
         }
     }
     fun getSymbol(s:String){

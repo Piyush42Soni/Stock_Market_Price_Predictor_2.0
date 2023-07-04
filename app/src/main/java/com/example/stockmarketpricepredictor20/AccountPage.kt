@@ -143,16 +143,16 @@ fun AccountPage() {
                             items(count = 10) {
                                 when ((it%4)) {
                                     0 -> {
-                                        element(name = CompanyName[(it%4)], Pic = R.drawable.m,colorList[(it%4)])
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.adanient,colorList[(it%4)])
                                     }
                                     1 -> {
-                                        element(name = CompanyName[(it%4)], Pic = R.drawable.b,colorList[(it%4)])
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.adanient,colorList[(it%4)])
                                     }
                                     2 -> {
-                                        element(name = CompanyName[(it%4)], Pic = R.drawable.c,colorList[(it%4)])
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.adanient,colorList[(it%4)])
                                     }
                                     else -> {
-                                        element(name = CompanyName[(it%4)], Pic = R.drawable.a,colorList[(it%4)])
+                                        element(name = CompanyName[(it%4)], Pic = R.drawable.adanient,colorList[(it%4)])
                                     }
                                 }
                             }
@@ -251,6 +251,6 @@ fun PreviewedHai() {
 @Composable
 fun Previewedai() {
     StockMarketPricePredictor20Theme {
-        element(name = "RAJU", Pic = R.drawable.m, Color.Black)
+        element(name = "RAJU", Pic = R.drawable.adanient, Color.Black)
     }
 }

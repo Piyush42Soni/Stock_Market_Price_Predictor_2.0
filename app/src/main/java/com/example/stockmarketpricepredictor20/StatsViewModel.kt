@@ -13,6 +13,7 @@ import com.example.stockmarketpricepredictor20.data.HistoricalData
 import com.example.stockmarketpricepredictor20.data.IndexTrendData
 import com.example.stockmarketpricepredictor20.data.ShareHoldingPatternData
 import com.example.stockmarketpricepredictor20.network.StockApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -59,6 +60,7 @@ class StatsViewModel : ViewModel() {
             } catch (e: HttpException) {
                 StockUiState1.Error
             }
+            delay(5000)
         }
     }
     fun getStockShareHoldingPatternData() {

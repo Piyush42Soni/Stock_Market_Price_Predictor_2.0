@@ -1,17 +1,20 @@
 package com.example.stockmarketpricepredictor20
 
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
@@ -25,7 +28,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -81,25 +86,101 @@ fun HomePage(
                         .fillMaxWidth()
                         .padding(20.dp)
                         .clickable {
-                            val companyName=SymbolList[it]
-                            onPageChange(priceList[it].quoteSummary.result[0].financialData.currentPrice.raw.toString(),companyName,priceList[it].quoteSummary.result[0].financialData.earningsGrowth.raw)
+                            val companyName = SymbolList[it]
+                            onPageChange(
+                                priceList[it].quoteSummary.result[0].financialData.currentPrice.raw.toString(),
+                                companyName,
+                                priceList[it].quoteSummary.result[0].financialData.earningsGrowth.raw
+                            )
                         }
                 ) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(text = SymbolList[it])
-                        Text(
-                            text = priceList[it].quoteSummary?.result?.get(0)?.financialData?.currentPrice?.raw.toString(),
-                            color =
-                            if (priceList[it].quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw!! >= 0f) {
-                                Color.Green
-                            } else {
-                                Color.Red
-                            }
-
-                        )
-
+                    @DrawableRes var Pic by rememberSaveable {
+                        mutableStateOf(R.drawable.adanient)
                     }
-                    Divider(Modifier.fillMaxWidth())
+                    Pic=when(SymbolList[it]){
+                        ("ADANIENT.NS")->R.drawable.adanient
+                        "ADANIPORTS.NS"->R.drawable.adaniports
+                                ("APOLLOHOSP.NS")->R.drawable.apollohosp
+                                ("ASIANPAINT.NS")->R.drawable.asianpaint
+                                ("AXISBANK.NS")->R.drawable.axisbank
+                                ("BAJAJ-AUTO.NS")->R.drawable.bajajauto
+                                ("BAJAJFINSV.NS")->R.drawable.bajajfinsiv
+                                ("BAJFINANCE.NS")->R.drawable.bajajfinance
+                                ("BHARTIARTL.NS")->R.drawable.bhartiairtel
+                                "BPCL.NS"->R.drawable.bpcl
+                        "BRITANNIA.NS"->R.drawable.britannia
+                        "CIPLA.NS"->R.drawable.cipla
+                            "COALINDIA.NS"->R.drawable.coalindia
+                        "DIVISLAB.NS"->R.drawable.divis
+                        "DRREDDY.NS"->R.drawable.drreddy
+                            "EICHERMOT.NS"->R.drawable.eichermot
+                        "GAIL.NS"->R.drawable.gail
+                        "GRASIM.NS"->R.drawable.grasim
+                            "HCLTECH.NS"->R.drawable.hcltech
+                        "HDFC.NS"->R.drawable.hdfc
+                        "HDFCBANK.NS"->R.drawable.hdfcbank
+                            "HDFCLIFE.NS"->R.drawable.hdfclife
+                        "HEROMOTOCO.NS"->R.drawable.heromoto
+                        "HINDALCO.NS"->R.drawable.hindalco
+                            "HINDUNILVR.NS"->R.drawable.unilever
+                        "ICICIBANK.NS"->R.drawable.icicibank
+                        "INDUSINDBK.NS"->R.drawable.indusindbank
+                            "INFY.NS"->R.drawable.infosys
+                        "ITC.NS"->R.drawable.itc
+                        "JSWSTEEL.NS"->R.drawable.jwssteel
+                            "KOTAKBANK.NS"->R.drawable.kotakbank
+                        "LT.NS"->R.drawable.lt
+                        "M&M.NS"->R.drawable.mandm
+                            "MARUTI.NS"->R.drawable.maruti
+                        "NESTLEIND.NS"->R.drawable.nestle
+                        "NTPC.NS"->R.drawable.ntpc
+                            "ONGC.NS"->R.drawable.ongc
+                        "POWERGRID.NS"->R.drawable.powergrid
+                        "RELIANCE.NS"->R.drawable.reliance
+                            "SBILIFE.NS"->R.drawable.sbilife
+                        "SBIN.NS"->R.drawable.sbin
+                        "SUNPHARMA.NS"->R.drawable.sunpharma
+                            "TATACONSUM.NS"->R.drawable.tataconsumer
+                        "TATASTEEL.NS"->R.drawable.tatasteel
+                        "TCS.NS"->R.drawable.tcs
+                            "TECHM.NS"->R.drawable.techm
+                        "TITN.NS"->R.drawable.titan
+                        "ULTRACEMCO.NS"->R.drawable.ultratech
+                            "UPL.NS"->R.drawable.upl
+                        "WIPRO.NS"->R.drawable.wipro
+
+                        else -> {R.drawable.adanient}
+                    }
+                    Row(Modifier.fillMaxWidth(),verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .size(50.dp),
+                            painter = painterResource(id = Pic),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(Modifier.size(10.dp))
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AdjustText(text = SymbolList[it], color = Color.White)
+                            AdjustText(
+                                text = priceList[it].quoteSummary?.result?.get(0)?.financialData?.currentPrice?.raw.toString(),
+                                color =
+                                if (priceList[it].quoteSummary?.result?.get(0)?.financialData?.earningsGrowth?.raw!! >= 0f) {
+                                    Color.Green
+                                } else {
+                                    Color.Red
+                                }
+
+                            )
+
+                        }
+                        Divider(Modifier.fillMaxWidth())
+                    }
                 }
             }
         }
