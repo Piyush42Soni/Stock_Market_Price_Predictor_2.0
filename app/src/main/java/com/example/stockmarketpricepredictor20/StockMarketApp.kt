@@ -63,115 +63,115 @@ enum class StockScreen(@StringRes val title: Int) {
     Login(title = R.string.Login),
     Stats(title = R.string.Stats)
 }
-@Composable
-fun StockTopAppBar(
-    currentScreen: StockScreen,
-    canNavigateBack: Boolean,
-    navigateUp: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    TopAppBar(
-        title = { AdjustText(text=(stringResource(currentScreen.title)), textStyleBody1 = MaterialTheme.typography.h6, color = Color.White) },
-        modifier = modifier,
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "",
-                        tint = Color.Black
-                    )
-                }
-            }
-        }
-    )
-}
-@Composable
-fun StockBottomAppBar(
-    modifier: Modifier = Modifier,
-    HomeNavigate:() -> Unit,
-    CompareNavigate:() -> Unit,
-    StatsNavigate:() -> Unit,
-    active:Int
-) {
-    BottomAppBar(modifier = modifier,){
-        if(active==1) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-
-                IconButton(onClick = { HomeNavigate() }) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(Icons.Filled.Home, contentDescription = "Localized description")
-                        Text(text = "Home")
-                    }
-                }
-            }
-        }
-        else{
-            IconButton(onClick = { HomeNavigate() }) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(Icons.Filled.Home, contentDescription = "Localized description")
-                    Text(text = "Home")
-                }
-            }
-        }
-        Spacer(Modifier.weight(0.5f, true))
-        if(active==2) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                IconButton(onClick = { CompareNavigate() }) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(Icons.Filled.Compare, contentDescription = "Localized description")
-                        Text(text = "Compare")
-                    }
-                }
-            }
-        }
-        else{
-            IconButton(onClick = { CompareNavigate() }) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(Icons.Filled.Compare, contentDescription = "Localized description")
-                    Text(text = "Compare")
-                }
-            }
-        }
-        Spacer(Modifier.weight(0.5f, true))
-        if(active==3) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-                IconButton(onClick = { StatsNavigate() }) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
-                        Text(text = "Stats")
-                    }
-                }
-            }
-        }
-        else{
-            IconButton(onClick = { StatsNavigate() }) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
-                    Text(text = "Stats")
-                }
-            }
-        }
-    }
-}
+//@Composable
+//fun StockTopAppBar(
+//    currentScreen: StockScreen,
+//    canNavigateBack: Boolean,
+//    navigateUp: () -> Unit = {},
+//    modifier: Modifier = Modifier
+//) {
+//    TopAppBar(
+//        title = { AdjustText(text=(stringResource(currentScreen.title)), textStyleBody1 = MaterialTheme.typography.h6, color = Color.White) },
+//        modifier = modifier,
+//        navigationIcon = {
+//            if (canNavigateBack) {
+//                IconButton(onClick = navigateUp) {
+//                    Icon(
+//                        imageVector = Icons.Filled.ArrowBack,
+//                        contentDescription = "",
+//                        tint = Color.Black
+//                    )
+//                }
+//            }
+//        }
+//    )
+//}
+//@Composable
+//fun StockBottomAppBar(
+//    modifier: Modifier = Modifier,
+//    HomeNavigate:() -> Unit,
+//    CompareNavigate:() -> Unit,
+//    StatsNavigate:() -> Unit,
+//    active:Int
+//) {
+//    BottomAppBar(modifier = modifier,){
+//        if(active==1) {
+//            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+//
+//                IconButton(onClick = { HomeNavigate() }) {
+//                    Column(
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        verticalArrangement = Arrangement.Center
+//                    ) {
+//                        Icon(Icons.Filled.Home, contentDescription = "Localized description")
+//                        Text(text = "Home")
+//                    }
+//                }
+//            }
+//        }
+//        else{
+//            IconButton(onClick = { HomeNavigate() }) {
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.Center
+//                ) {
+//                    Icon(Icons.Filled.Home, contentDescription = "Localized description")
+//                    Text(text = "Home")
+//                }
+//            }
+//        }
+//        Spacer(Modifier.weight(0.5f, true))
+//        if(active==2) {
+//            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+//                IconButton(onClick = { CompareNavigate() }) {
+//                    Column(
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        verticalArrangement = Arrangement.Center
+//                    ) {
+//                        Icon(Icons.Filled.Compare, contentDescription = "Localized description")
+//                        Text(text = "Compare")
+//                    }
+//                }
+//            }
+//        }
+//        else{
+//            IconButton(onClick = { CompareNavigate() }) {
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.Center
+//                ) {
+//                    Icon(Icons.Filled.Compare, contentDescription = "Localized description")
+//                    Text(text = "Compare")
+//                }
+//            }
+//        }
+//        Spacer(Modifier.weight(0.5f, true))
+//        if(active==3) {
+//            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+//                IconButton(onClick = { StatsNavigate() }) {
+//                    Column(
+//                        horizontalAlignment = Alignment.CenterHorizontally,
+//                        verticalArrangement = Arrangement.Center
+//                    ) {
+//                        Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
+//                        Text(text = "Stats")
+//                    }
+//                }
+//            }
+//        }
+//        else{
+//            IconButton(onClick = { StatsNavigate() }) {
+//                Column(
+//                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    verticalArrangement = Arrangement.Center
+//                ) {
+//                    Icon(Icons.Filled.QueryStats, contentDescription = "Localized description")
+//                    Text(text = "Stats")
+//                }
+//            }
+//        }
+//    }
+//}
 @Composable
 fun StockMarketApp(
     navController: NavHostController = rememberNavController()
@@ -261,7 +261,7 @@ fun StockMarketApp(
                     currentActive.value=2
                 }
                 composable(route = StockScreen.Login.name) {
-                    LoginPage(onSendButtonClicked = { navController.navigate(StockScreen.Home.name) })
+//                    LoginPage(onSendButtonClicked = { navController.navigate(StockScreen.Home.name) })
                     bottomBarState.value=false
                     topBarState.value=false
                     currentActive.value=0

@@ -1,31 +1,42 @@
 package com.example.stockmarketpricepredictor20
 
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.stockmarketpricepredictor20.ui.theme.StockMarketPricePredictor20Theme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.stockmarketpricepredictor20.auth.SignInState
 import com.example.stockmarketpricepredictor20.ui.theme.BackgroundColor
 import com.example.stockmarketpricepredictor20.ui.theme.buttonTextColor
 
 @Composable
-fun LoginPage(onSendButtonClicked : () -> Unit) {
+fun LoginPage(state: SignInState,
+              onSignInClick: () -> Unit
+) {
+    val context = LocalContext.current
+    LaunchedEffect(key1 = state.signInError) {
+        state.signInError?.let { error ->
+            Toast.makeText(
+                context,
+                error,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     Column(modifier = Modifier
         .fillMaxSize()
         .background(BackgroundColor)
@@ -90,7 +101,7 @@ fun LoginPage(onSendButtonClicked : () -> Unit) {
                 .padding(horizontal=55.dp),
             onClick = {
 //                if(username=="YOHO" && password=="YOHO") {
-                    onSendButtonClicked()
+                    onSignInClick()
 //                }
             }
             , shape = MaterialTheme.shapes.small
@@ -109,10 +120,10 @@ fun LoginPage(onSendButtonClicked : () -> Unit) {
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun Previewed() {
-    StockMarketPricePredictor20Theme {
-        LoginPage(onSendButtonClicked = {})
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun Previewed() {
+//    StockMarketPricePredictor20Theme {
+//        LoginPage(onSendButtonClicked = {})
+//    }
+//}
