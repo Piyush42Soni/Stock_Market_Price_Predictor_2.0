@@ -49,7 +49,6 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
         is StockUiState1.Success -> {
             when (statsViewModel2.stockUiState) {
                 is StockUiState1.Success -> {
-                    Log.d("GOHO", (statsViewModel.stockUiState as StockUiState1.Success).photos.size.toString())
                     val list = listOf<String>("1D", "1W", "1M", "1Y")
                     var state by remember {
                         mutableStateOf(0)
@@ -62,7 +61,7 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
                     when (state) {
                         0 -> {
                             lateinit var d: Date
-                            list3 = mutableListOf()
+                            list3.clear()
                             for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                                 d = Date((i * 1000))
                                 list3.add("${d.hours}:${d.minutes}")
@@ -86,7 +85,7 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
                         }
 
                         2 -> {
-                            list3 = mutableListOf()
+                            list3.clear()
                             for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                                 val d = Date(i.toLong() * 1000)
                                 list3.add((d.date).toString())
@@ -94,11 +93,11 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
                         }
 
                         else -> {
-                            list3 = mutableListOf()
+                            list3.clear()
                             for (i in (statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].timestamp) {
                                 val d = Date(i.toLong() * 1000)
                                 list3.add(
-                                    when (d.day) {
+                                    when (d.month) {
                                         0 -> "Jan"
                                         1 -> "Feb"
                                         2 -> "Mar"
@@ -130,33 +129,88 @@ fun ComparePage(statsViewModel: StatsViewModel,statsViewModel2: StatsViewModel) 
 
                     val list2 =
                         ((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                    var x=0f
-                    for(i in list2){
-                        if(i!=null){
-                            x=i
-                        }
-                    }
-                    list2.replaceAll { it ?: x }
-                    list2 as List<Float>
                     val list4 =
                         ((statsViewModel2.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                    var y=0f
-                    for(i in list4){
-                        if(i!=null){
-                            y=i
+                    val c=((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
+                    for(i in c.indices){
+                        if(i==0 && c[i]==null){
+                            var y=1
+                            while(y<c.size && c[y]==null){
+                                y++
+                            }
+                            if(y<c.size) {
+                                c[i] = c[y]
+                                list2[i] = c[y]
+                            }
+                            else{
+                                c[i]=0f
+                                list2[i]=0f
+                            }
+                        }
+                        else if(c[i]==null){
+                            var y=i-1
+                            while(y>=0 && c[y]==null){
+                                y--
+                            }
+                            if(y==-1){
+                                y=0
+                                while(y<c.size && c[y]==null){
+                                    y++
+                                }
+                            }
+                            if(y<c.size) {
+                                c[i] = c[y]
+                                list2[i] = c[y]
+                            }
+                            else{
+                                c[i]=0f
+                                list2[i]=0f
+                            }
                         }
                     }
-                    list4.replaceAll { it ?: y }
-                    list4 as List<Float>
-                    val c=((statsViewModel.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                    c.replaceAll{it?:x}
+                    list2 as List<Float>
                     c as MutableList<Float>
                     c.replaceAll { it-list2.min() }
                     c.reverse()
                     list3.reverse()
-
                     val c1=((statsViewModel2.stockUiState as StockUiState1.Success).photos[state].chart.result[0].indicators.quote[0].open.reversed() as MutableList<Float?>)
-                    c1.replaceAll{it?:y}
+                    for(i in c1.indices){
+                        if(i==0 && c1[i]==null){
+                            var y=1
+                            while(y<c1.size && c1[y]==null){
+                                y++
+                            }
+                            if(y<c1.size) {
+                                c1[i] = c1[y]
+                                list4[i] = c1[y]
+                            }
+                            else{
+                                c1[i]=0f
+                                list4[i]=0f
+                            }
+                        }
+                        else if(c1[i]==null){
+                            var y=i-1
+                            while(y>=0 && c1[y]==null){
+                                y--
+                            }
+                            if(y==-1){
+                                y=0
+                                while(y<c1.size && c1[y]==null){
+                                    y++
+                                }
+                            }
+                            if(y<c1.size) {
+                                c1[i] = c1[y]
+                                list4[i] = c1[y]
+                            }
+                            else{
+                                c1[i]=0f
+                                list4[i]=0f
+                            }
+                        }
+                    }
+                    list4 as List<Float>
                     c1 as MutableList<Float>
                     c1.replaceAll { it-list4.min() }
                     c1.reverse()
