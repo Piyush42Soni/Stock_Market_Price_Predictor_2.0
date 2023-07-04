@@ -26,15 +26,20 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.example.stockmarketpricepredictor20.auth.UserData
 import com.example.stockmarketpricepredictor20.ui.theme.*
 
 @Composable
-fun AccountPage() {
+fun AccountPage(userData: UserData?,
+                onSignOut: () -> Unit) {
 //    Column(modifier = Modifier.fillMaxSize().background(BackgroundColor)) {
 //        val list=listOf("Home","Stats")
 //        var state:Int by remember {
@@ -63,14 +68,16 @@ fun AccountPage() {
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(15.dp)) {
-            Image(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .size(120.dp),
-                painter = painterResource(id = R.drawable.rrr),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
+            if(userData?.profilePictureUrl != null) {
+                AsyncImage(
+                    model = userData.profilePictureUrl,
+                    contentDescription = "Profile picture",
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
             Spacer(Modifier.size(15.dp))
             Text(
                 text = "Greetings,",
@@ -79,12 +86,14 @@ fun AccountPage() {
                 color = Color.White
             )
             Spacer(Modifier.size(10.dp))
-            Text(
-                text = "Name",
-                fontSize = 23.sp,
-                style = MaterialTheme.typography.h1,
-                color = Color.White
-            )
+            if(userData?.username != null) {
+                Text(
+                    text = userData.username,
+                    textAlign = TextAlign.Center,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
             Spacer(Modifier.size(15.dp))
             Card(
                 Modifier
@@ -160,6 +169,9 @@ fun AccountPage() {
                     }
                 }
             }
+        }
+        Button(onClick = onSignOut) {
+            Text(text = "Sign out")
         }
     }
 }
