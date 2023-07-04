@@ -25,6 +25,8 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.filled.Compare
@@ -192,23 +194,43 @@ fun StockMarketApp(
             )
         },
         bottomBar ={
-            if(bottomBarState.value) {
-                StockBottomAppBar(
-                    HomeNavigate = {
-                        navController.navigate(StockScreen.Home.name)
-                    },
-                    StatsNavigate = {
-                        navController.navigate(StockScreen.Stats.name)
-                    },
-                    CompareNavigate = {
-                        navController.navigate(StockScreen.Compare.name)
-                    },
-                    active = currentActive.value
-                )
-            }
+//            if(bottomBarState.value) {
+//                StockBottomAppBar(
+//                    HomeNavigate = {
+//                        navController.navigate(StockScreen.Home.name)
+//                    },
+//                    StatsNavigate = {
+//                        navController.navigate(StockScreen.Stats.name)
+//                    },
+//                    CompareNavigate = {
+//                        navController.navigate(StockScreen.Compare.name)
+//                    },
+//                    active = currentActive.value
+//                )
+//            }
         }
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize()) {
+            if(currentActive.value!=0) {
+                TabRow(selectedTabIndex = currentActive.value - 1) {
+                    Tab(
+                        text = { Text("Home") },
+                        selected = currentActive.value == 1,
+                        onClick = {
+                            currentActive.value = 1
+                            navController.navigate(StockScreen.Home.name)
+                        }
+                    )
+                    Tab(
+                        text = { Text("Compare") },
+                        selected = currentActive.value == 2,
+                        onClick = {
+                            currentActive.value = 2
+                            navController.navigate(StockScreen.Compare.name)
+                        }
+                    )
+                }
+            }
             NavHost(
                 navController = navController,
                 startDestination = StockScreen.Login.name,
@@ -248,7 +270,7 @@ fun StockMarketApp(
                     StatsPage(statsViewModel)
                     bottomBarState.value=true
                     topBarState.value=true
-                    currentActive.value=3
+                    currentActive.value=1
                 }
             }
         }
