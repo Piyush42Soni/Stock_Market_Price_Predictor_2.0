@@ -9,6 +9,7 @@
   ![Android](https://img.shields.io/badge/Android-37F52FF.svg?style=for-the-badge&logo=Android&logoColor=white)
   ![SQLite](https://img.shields.io/badge/SQLite-293764.svg?style=for-the-badge&logo=SQLite&logoColor=white)
   ![Firebase](https://img.shields.io/badge/Firebase-972.svg?style=for-the-badge&logo=Firebase&logoColor=white)
+  ![Kivy](https://img.shields.io/badge/Kivy-472.svg?style=for-the-badge&logo=Kivy&logoColor=white)
 </div>
 
 ## Description
