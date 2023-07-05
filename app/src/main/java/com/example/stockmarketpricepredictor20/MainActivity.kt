@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -55,6 +56,12 @@ import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    enum class StockScreen(@StringRes val title: Int) {
+        Home(title = R.string.app_name),
+        Compare(title = R.string.Compare),
+        Login(title = R.string.Login),
+        Stats(title = R.string.Stats)
+    }
     private val googleAuthUiClient by lazy {
         GoogleAuthUiClient(
             context = applicationContext,
@@ -224,7 +231,7 @@ class MainActivity : ComponentActivity() {
     }
 @Composable
 fun StockTopAppBar(
-    currentScreen: StockScreen,
+    currentScreen: MainActivity.StockScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit = {},
     modifier: Modifier = Modifier

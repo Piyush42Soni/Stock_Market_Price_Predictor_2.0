@@ -144,7 +144,7 @@ fun HomePage(
                         "TATASTEEL.NS"->R.drawable.tatasteel
                         "TCS.NS"->R.drawable.tcs
                             "TECHM.NS"->R.drawable.techm
-                        "TITN.NS"->R.drawable.titan
+                        "TITAN.NS"->R.drawable.titan
                         "ULTRACEMCO.NS"->R.drawable.ultratech
                             "UPL.NS"->R.drawable.upl
                         "WIPRO.NS"->R.drawable.wipro
