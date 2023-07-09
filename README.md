@@ -28,11 +28,11 @@ It is an Android and Windows app which shows the latest and historical data and 
 ## App UI Design
 
 <div align="center"> 
- <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u1.jpeg" width=170 />
- <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u2.jpeg" width=170 />
-  <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u3.jpeg" width=170 />
- <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u4.jpeg" width=170 />
-  <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u5.jpeg" width=170 />
+ <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u1.jpeg" width=165 />
+ <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u2.jpeg" width=165 />
+  <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u3.jpeg" width=165 />
+ <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u4.jpeg" width=165 />
+  <img src="https://github.com/Piyush42Soni/Stock_Market_Price_Predictor_2.0/blob/master/images_for_readme/u5.jpeg" width=165 />
 </div>
 
 ## Deep Learning Model Structure
